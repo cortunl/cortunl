@@ -11,6 +11,7 @@ Thumbs.db
 *.egg-info
 .sass-cache
 cortunl.iml
+/cortunl
 /dart/.pub
 /dart/packages
 /dart/web/packages

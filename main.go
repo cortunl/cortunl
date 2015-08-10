@@ -9,6 +9,6 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = constants.NameFormated
-	app.Version = "0.1.0"
+	app.Version = constants.Version
 	app.Run(os.Args)
 }

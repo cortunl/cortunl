@@ -1,6 +1,6 @@
 package network
 
-type Wireless struct {
+type WirelessNetwork struct {
 	*Network
 	Ssid         string
 	Quality      int

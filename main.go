@@ -7,6 +7,6 @@ import (
 func main() {
 	_, err := cmd.Run()
 	if err != nil {
-		return
+		panic(err)
 	}
 }

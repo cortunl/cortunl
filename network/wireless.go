@@ -1,10 +1,16 @@
 package network
 
+const (
+	Wpa2 SecurityType = "wpa2"
+)
+
+type SecurityType string
+
 type WirelessNetwork struct {
 	*Network
 	Ssid         string
 	Quality      int
 	Channel      int
-	SecurityType string
+	Security     SecurityType
 	SecurityData interface{}
 }

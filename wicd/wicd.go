@@ -3,7 +3,6 @@ package wicd
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/cortunl/cortunl/network"
-	"github.com/dropbox/godropbox/errors"
 	"github.com/pacur/pacur/utils"
 	"strconv"
 	"strings"

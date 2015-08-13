@@ -1,6 +1,7 @@
 package wicd
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/cortunl/cortunl/network"
 	"github.com/dropbox/godropbox/errors"
 	"github.com/pacur/pacur/utils"
@@ -16,6 +17,7 @@ func Scan() (networks []*network.WirelessNetwork, err error) {
 	}
 
 	lines := strings.Split(output, "\n")
+Network:
 	for _, line := range lines[1:] {
 		if line == "" {
 			continue
@@ -67,11 +69,12 @@ func Scan() (networks []*network.WirelessNetwork, err error) {
 				case "NONE":
 					net.Security = network.None
 				default:
-					err = &ParseError{
-						errors.Newf("wicd: Unknown encryption type '%s'",
-							val),
-					}
-					return
+					logrus.WithFields(logrus.Fields{
+						"id":       num,
+						"ssid":     net.Ssid,
+						"security": val,
+					}).Info("wicd: Unknown encryption type")
+					continue Network
 				}
 			case "Quality:":
 				net.Quality, err = strconv.Atoi(val)

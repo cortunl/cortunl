@@ -79,20 +79,26 @@ Network:
 			case "Quality:":
 				net.Quality, err = strconv.Atoi(val)
 				if err != nil {
-					err = &ParseError{
-						errors.Newf("wicd: Failed to parse quality '%s'",
-							val),
-					}
-					return
+					logrus.WithFields(logrus.Fields{
+						"id":      num,
+						"ssid":    net.Ssid,
+						"quality": val,
+						"error":   err,
+					}).Warning("wicd: Failed to parse quality")
+					err = nil
+					continue Network
 				}
 			case "Channel:":
 				net.Channel, err = strconv.Atoi(val)
 				if err != nil {
-					err = &ParseError{
-						errors.Newf("wicd: Failed to parse channel '%s'",
-							val),
-					}
-					return
+					logrus.WithFields(logrus.Fields{
+						"id":      num,
+						"ssid":    net.Ssid,
+						"channel": val,
+						"error":   err,
+					}).Warning("wicd: Failed to parse channel")
+					err = nil
+					continue Network
 				}
 			}
 		}

@@ -73,7 +73,7 @@ Network:
 						"id":       num,
 						"ssid":     net.Ssid,
 						"security": val,
-					}).Info("wicd: Unknown encryption type")
+					}).Warning("wicd: Unknown encryption type")
 					continue Network
 				}
 			case "Quality:":

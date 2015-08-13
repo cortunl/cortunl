@@ -46,10 +46,11 @@ Network:
 
 			fields := strings.Fields(line)
 			if len(fields) < 2 {
-				err = &ParseError{
-					errors.Newf("wicd: Failed to parse line '%s'", line),
-				}
-				return
+				logrus.WithFields(logrus.Fields{
+					"id":   num,
+					"line": line,
+				}).Error("wicd: Failed to parse line")
+				continue Network
 			}
 
 			key := fields[0]

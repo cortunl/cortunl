@@ -6,9 +6,17 @@ import (
 	"github.com/pacur/pacur/utils"
 	"strconv"
 	"strings"
+	"sync"
+)
+
+var (
+	lock = sync.Mutex{}
 )
 
 func GetNetworks() (networks []*network.WirelessNetwork, err error) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	output, err := utils.ExecOutput("", "wicd-cli", "--wireless",
 		"--scan", "--list-networks")
 	if err != nil {

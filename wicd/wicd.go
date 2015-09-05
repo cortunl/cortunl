@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Scan() (networks []*network.WirelessNetwork, err error) {
+func GetNetworks() (networks []*network.WirelessNetwork, err error) {
 	output, err := utils.ExecOutput("", "wicd-cli", "--wireless",
 		"--scan", "--list-networks")
 	if err != nil {

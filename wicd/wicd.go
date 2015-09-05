@@ -43,7 +43,7 @@ Network:
 				continue
 			}
 
-			fields := strings.Fields(line)
+			fields := strings.Split(line, ":")
 			if len(fields) < 2 {
 				logrus.WithFields(logrus.Fields{
 					"id":   num,
@@ -52,13 +52,13 @@ Network:
 				continue Network
 			}
 
-			key := fields[0]
-			val := fields[1]
+			key := strings.TrimSpace(fields[0])
+			val := strings.TrimSpace(fields[1])
 
 			switch key {
-			case "Essid:":
+			case "Essid":
 				net.Ssid = val
-			case "Encryption Method:":
+			case "Encryption Method":
 				switch val {
 				case "WEP":
 					net.Security = network.Wep
@@ -76,7 +76,7 @@ Network:
 					}).Warning("wicd: Unknown encryption type")
 					continue Network
 				}
-			case "Quality:":
+			case "Quality":
 				net.Quality, err = strconv.Atoi(val)
 				if err != nil {
 					logrus.WithFields(logrus.Fields{
@@ -88,7 +88,7 @@ Network:
 					err = nil
 					continue Network
 				}
-			case "Channel:":
+			case "Channel":
 				net.Channel, err = strconv.Atoi(val)
 				if err != nil {
 					logrus.WithFields(logrus.Fields{

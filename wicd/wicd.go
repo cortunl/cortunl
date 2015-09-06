@@ -97,16 +97,8 @@ Network:
 			case "Essid":
 				net.Ssid = val
 			case "Encryption Method":
-				switch val {
-				case "WEP":
-					net.Security = network.Wep
-				case "WPA":
-					net.Security = network.Wpa
-				case "WPA2":
-					net.Security = network.Wpa2
-				case "NONE":
-					net.Security = network.None
-				default:
+				sec := security.GetSecurity(strings.ToLower(val))
+				if sec == nil {
 					logrus.WithFields(logrus.Fields{
 						"id":       num,
 						"ssid":     net.Ssid,
@@ -114,6 +106,8 @@ Network:
 					}).Warning("wicd: Unknown encryption type")
 					continue Network
 				}
+
+				net.Security = sec
 			case "Quality":
 				net.Quality, err = strconv.Atoi(val)
 				if err != nil {

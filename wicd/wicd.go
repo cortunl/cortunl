@@ -3,6 +3,7 @@ package wicd
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/cortunl/cortunl/network"
+	"github.com/cortunl/cortunl/security"
 	"github.com/dropbox/godropbox/errors"
 	"github.com/pacur/pacur/utils"
 	"strconv"
@@ -40,6 +41,33 @@ func getNetworkNum(ssid string) (num string, err error) {
 	err = &NotFound{
 		errors.Newf("wicd: Failed to find ssid '%s'", ssid),
 	}
+	return
+}
+
+func Connect(net *network.WirelessNetwork) (err error) {
+	lock.Lock()
+	defer lock.Unlock()
+
+	num, err := getNetworkNum(net.Ssid)
+	if err != nil {
+		return
+	}
+
+	for key, val := range net.Security.Properties() {
+		err = utils.Exec("", "wicd-cli", "--wireless",
+			"--network", num, "--network-property", key,
+			"--set-to", val)
+		if err != nil {
+			return
+		}
+	}
+
+	err = utils.Exec("", "wicd-cli", "--wireless",
+		"--network", num, "--connect")
+	if err != nil {
+		return
+	}
+
 	return
 }
 

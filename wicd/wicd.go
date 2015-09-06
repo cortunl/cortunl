@@ -3,6 +3,7 @@ package wicd
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/cortunl/cortunl/network"
+	"github.com/dropbox/godropbox/errors"
 	"github.com/pacur/pacur/utils"
 	"strconv"
 	"strings"
@@ -12,6 +13,35 @@ import (
 var (
 	lock = sync.Mutex{}
 )
+
+func getNetworkNum(ssid string) (num string, err error) {
+	output, err := utils.ExecOutput("", "wicd-cli", "--wireless",
+		"--scan", "--list-networks")
+	if err != nil {
+		return
+	}
+
+	lines := strings.Split(output, "\n")
+	for _, line := range lines[1:] {
+		fields := strings.Fields(line)
+		if len(fields) < 4 {
+			err = &ParseError{
+				errors.Newf("wicd: Too few fields on line '%s'", line),
+			}
+			return
+		}
+
+		if fields[3] == ssid {
+			num = fields[0]
+			return
+		}
+	}
+
+	err = &NotFound{
+		errors.Newf("wicd: Failed to find ssid '%s'", ssid),
+	}
+	return
+}
 
 func GetNetworks() (networks []*network.WirelessNetwork, err error) {
 	lock.Lock()

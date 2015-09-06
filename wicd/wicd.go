@@ -33,7 +33,7 @@ Network:
 		num := strings.Fields(line)[0]
 
 		output, e := utils.ExecOutput("", "wicd-cli", "--wireless",
-			"--network-details", "--network", num)
+			"--network", num, "--network-details")
 		if e != nil {
 			err = e
 			return

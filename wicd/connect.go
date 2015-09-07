@@ -2,7 +2,7 @@ package wicd
 
 import (
 	"github.com/cortunl/cortunl/network"
-	"github.com/pacur/pacur/utils"
+	"github.com/cortunl/cortunl/utils"
 )
 
 func connectWired() (err error) {

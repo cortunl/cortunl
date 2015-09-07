@@ -1,8 +1,8 @@
 package dbus
 
 import (
-	"github.com/docker/docker/vendor/src/github.com/godbus/dbus"
 	"github.com/dropbox/godropbox/errors"
+	"github.com/guelfey/go.dbus"
 )
 
 type Call struct {

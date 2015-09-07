@@ -14,6 +14,10 @@ var (
 	}
 )
 
+func init() {
+	commands = append(commands, versionCmd)
+}
+
 func version(c *cli.Context) {
 	fmt.Printf("v%s\n", constants.Version)
 }

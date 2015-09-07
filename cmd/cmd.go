@@ -7,14 +7,14 @@ import (
 	"os"
 )
 
+var commands = []cli.Command{}
+
 func Run() (app *cli.App, err error) {
 	app = cli.NewApp()
 	app.Name = constants.NameFormated
 	app.Version = constants.Version
 
-	app.Commands = []cli.Command{
-		versionCmd,
-	}
+	app.Commands = commands
 
 	err = app.Run(os.Args)
 	if err != nil {

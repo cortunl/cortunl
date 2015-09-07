@@ -2,6 +2,7 @@ package wicd
 
 import (
 	"net"
+	"strconv"
 )
 
 const (
@@ -21,7 +22,7 @@ type Status struct {
 	Type     ConnectionType
 	Ip       net.IP
 	Ssid     string
-	Strength string
+	Strength int
 }
 
 func GetStatus() (status *Status, err error) {
@@ -62,7 +63,9 @@ func GetStatus() (status *Status, err error) {
 		status.State = Connected
 		status.Type = Wireless
 		status.Ssid = info[1]
-		status.Strength = info[2]
+
+		strength, _ := strconv.Atoi(info[2])
+		status.Strength = strength
 	case 3:
 		status.State = Connected
 		status.Type = Wired

@@ -49,6 +49,11 @@ func connectWireless(net *network.WirelessNetwork) (err error) {
 }
 
 func Connect(netIntf interface{}) (err error) {
+	err = Disconnect()
+	if err != nil {
+		return
+	}
+
 	switch net := netIntf.(type) {
 	case *network.WiredNetwork:
 		err = connectWired()

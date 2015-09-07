@@ -13,3 +13,13 @@ func daemon() (conn *dbus.Conn, err error) {
 
 	return
 }
+
+func wired() (conn *dbus.Conn, err error) {
+	conn, err = dbus.NewConn(dbus.SystemBus,
+		"org.wicd.daemon", "/org/wicd/daemon/wireless")
+	if err != nil {
+		return
+	}
+
+	return
+}

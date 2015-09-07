@@ -10,7 +10,6 @@ func connectWired() (err error) {
 	if err != nil {
 		return
 	}
-	defer conn.Close()
 
 	_, err = conn.Call("ConnectWired")
 	if err != nil {

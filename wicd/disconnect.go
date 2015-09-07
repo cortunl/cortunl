@@ -5,7 +5,6 @@ func Disconnect() (err error) {
 	if err != nil {
 		return
 	}
-	defer conn.Close()
 
 	_, err = conn.Call("Disconnect")
 	if err != nil {

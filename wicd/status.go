@@ -29,7 +29,6 @@ func GetStatus() (status *Status, err error) {
 	status = &Status{}
 
 	conn, err := daemon()
-	defer conn.Close()
 
 	call, err := conn.Call("GetConnectionStatus")
 	if err != nil {

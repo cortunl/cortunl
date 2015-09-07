@@ -44,33 +44,6 @@ func getNetworkNum(ssid string) (num string, err error) {
 	return
 }
 
-func Connect(net *network.WirelessNetwork) (err error) {
-	lock.Lock()
-	defer lock.Unlock()
-
-	num, err := getNetworkNum(net.Ssid)
-	if err != nil {
-		return
-	}
-
-	for key, val := range net.Security.Properties() {
-		err = utils.Exec("", "wicd-cli", "--wireless",
-			"--network", num, "--network-property", key,
-			"--set-to", val)
-		if err != nil {
-			return
-		}
-	}
-
-	err = utils.Exec("", "wicd-cli", "--wireless",
-		"--network", num, "--connect")
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 func GetNetworks() (networks []*network.WirelessNetwork, err error) {
 	lock.Lock()
 	defer lock.Unlock()

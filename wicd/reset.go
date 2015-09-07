@@ -5,7 +5,6 @@ func Reset() (err error) {
 	if err != nil {
 		return
 	}
-	defer conn.Close()
 
 	_, err = conn.Call("SetSignalDisplayType", "0")
 	if err != nil {

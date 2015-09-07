@@ -1,7 +1,6 @@
 package wicd
 
 import (
-	"github.com/cortunl/cortunl/dbus"
 	"net"
 )
 

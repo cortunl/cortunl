@@ -16,6 +16,16 @@ func daemon() (conn *dbus.Conn, err error) {
 
 func wired() (conn *dbus.Conn, err error) {
 	conn, err = dbus.NewConn(dbus.SystemBus,
+		"org.wicd.daemon", "/org/wicd/daemon/wired")
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func wireless() (conn *dbus.Conn, err error) {
+	conn, err = dbus.NewConn(dbus.SystemBus,
 		"org.wicd.daemon", "/org/wicd/daemon/wireless")
 	if err != nil {
 		return

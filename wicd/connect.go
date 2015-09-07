@@ -20,39 +20,45 @@ func connectWired() (err error) {
 	return
 }
 
+func connectWireless(net *network.WirelessNetwork) (err error) {
+	lock.Lock()
+	defer lock.Unlock()
+
+	num, e := getNetworkNum(net.Ssid)
+	if e != nil {
+		err = e
+		return
+	}
+
+	for key, val := range net.Security.Properties() {
+		err = utils.Exec("", "wicd-cli", "--wireless",
+			"--network", num, "--network-property", key,
+			"--set-to", val)
+		if err != nil {
+			return
+		}
+	}
+
+	err = utils.Exec("", "wicd-cli", "--wireless",
+		"--network", num, "--connect")
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func Connect(netIntf interface{}) (err error) {
 	switch net := netIntf.(type) {
 	case *network.WiredNetwork:
 		err = connectWired()
-		if err != nil {
-			return
-		}
 	case *network.WirelessNetwork:
-		lock.Lock()
-		defer lock.Unlock()
-
-		num, e := getNetworkNum(net.Ssid)
-		if e != nil {
-			err = e
-			return
-		}
-
-		for key, val := range net.Security.Properties() {
-			err = utils.Exec("", "wicd-cli", "--wireless",
-				"--network", num, "--network-property", key,
-				"--set-to", val)
-			if err != nil {
-				return
-			}
-		}
-
-		err = utils.Exec("", "wicd-cli", "--wireless",
-			"--network", num, "--connect")
-		if err != nil {
-			return
-		}
+		err = connectWireless(net)
 	default:
 		panic("wicd: Unknown network type")
+	}
+	if err != nil {
+		return
 	}
 
 	return

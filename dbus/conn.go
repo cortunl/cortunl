@@ -9,13 +9,14 @@ import (
 type Conn struct {
 	conn *dbus.Conn
 	obj  *dbus.Object
+	intf string
 }
 
 func (c *Conn) Call(method string, args ...interface{}) (
 	call *Call, err error) {
 
 	call = &Call{
-		call: c.obj.Call(method, 0, args...),
+		call: c.obj.Call(c.intf+"."+method, 0, args...),
 	}
 	err = call.init()
 	if err != nil {
@@ -37,7 +38,9 @@ func (c *Conn) Close() (err error) {
 	return
 }
 
-func NewConn(typ BusType, dest string, path string) (conn *Conn, err error) {
+func NewConn(typ BusType, dest string, path string, intf string) (
+	conn *Conn, err error) {
+
 	c := &dbus.Conn{}
 
 	switch typ {
@@ -64,6 +67,7 @@ func NewConn(typ BusType, dest string, path string) (conn *Conn, err error) {
 	conn = &Conn{
 		conn: c,
 		obj:  obj,
+		intf: intf,
 	}
 
 	return

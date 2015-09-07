@@ -33,6 +33,7 @@ func GetStatus() (status *Status, err error) {
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 
 	call, err := conn.Call("GetConnectionStatus")
 	if err != nil {

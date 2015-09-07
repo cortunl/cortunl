@@ -23,7 +23,7 @@ func (s *OpenSecurity) Params() (params []*SecurityParam) {
 
 func (s *OpenSecurity) Set(key, val string) (err error) {
 	err = &UnknownError{
-		errors.New("security.wpa: Unknown security parameter"),
+		errors.New("security.open: Unknown security parameter"),
 	}
 	return
 }

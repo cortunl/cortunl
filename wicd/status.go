@@ -28,11 +28,7 @@ type Status struct {
 func GetStatus() (status *Status, err error) {
 	status = &Status{}
 
-	conn, err := dbus.NewConn(dbus.SystemBus,
-		"org.wicd.daemon", "/org/wicd/daemon")
-	if err != nil {
-		return
-	}
+	conn, err := daemon()
 	defer conn.Close()
 
 	call, err := conn.Call("GetConnectionStatus")

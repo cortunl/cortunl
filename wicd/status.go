@@ -1,7 +1,7 @@
 package wicd
 
 import (
-	"github.com/guelfey/go.dbus"
+	"github.com/cortunl/cortunl/dbus"
 	"net"
 )
 
@@ -28,21 +28,21 @@ type Status struct {
 func GetStatus() (status *Status, err error) {
 	status = &Status{}
 
-	conn, err := dbus.SystemBus()
+	conn, err := dbus.NewConn(dbus.SystemBus,
+		"org.wicd.daemon", "/org/wicd/daemon")
 	if err != nil {
-		panic(err)
+		return
 	}
 
-	daemon := conn.Object("org.wicd.daemon", "/org/wicd/daemon")
-	call := daemon.Call("GetConnectionStatus", 0)
-	if call.Err != nil {
-		panic(call.Err)
+	call, err := conn.Call("GetConnectionStatus")
+	if err != nil {
+		return
 	}
 
 	data := []interface{}{}
-	err = call.Store(&data)
+	err = call.Bind(&data)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	state := int(data[0].(uint32))

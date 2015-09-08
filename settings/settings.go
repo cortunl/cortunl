@@ -1,6 +1,11 @@
 package settings
 
-var Settings = &SettingsData{}
+var Settings = &SettingsData{
+	ExternalWired: []string{},
+	ExternalWireless: []string{
+		"wlan0",
+	},
+}
 
 type SettingsData struct {
 	ExternalWired    []string

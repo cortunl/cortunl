@@ -1,7 +1,29 @@
 package wicd
 
+import (
+	"github.com/cortunl/cortunl/settings"
+)
+
 func Reset() (err error) {
 	conn, err := daemon()
+	if err != nil {
+		return
+	}
+
+	wired := ""
+	if len(settings.Settings.ExternalWired) > 0 {
+		wired = settings.Settings.ExternalWired[0]
+	}
+	_, err = conn.Call("SetWiredInterface", wired)
+	if err != nil {
+		return
+	}
+
+	wireless := ""
+	if len(settings.Settings.ExternalWireless) > 0 {
+		wireless = settings.Settings.ExternalWireless[0]
+	}
+	_, err = conn.Call("SetWirelessInterface", wireless)
 	if err != nil {
 		return
 	}

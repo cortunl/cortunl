@@ -5,6 +5,7 @@ var Settings = &SettingsData{
 	ExternalWireless: []string{
 		"wlan0",
 	},
+	WirelessDriver: "auto",
 }
 
 type SettingsData struct {
@@ -14,4 +15,5 @@ type SettingsData struct {
 	InternalWireless []string
 	WirelessSsid     string
 	WirelessPassword string
+	WirelessDriver   string
 }

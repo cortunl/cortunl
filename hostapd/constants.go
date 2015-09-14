@@ -11,7 +11,9 @@ const (
 const conf = `driver=%s
 ssid=%s
 interface=%s
-channel=%d
+channel=%d%s`
+
+const wpaConf = `
 auth_algs=1
 wpa=2
 wpa_passphrase=%s

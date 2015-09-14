@@ -1,6 +1,7 @@
 package hostapd
 
 const (
+	Auto = "auto"
 	NetLink = "nl80211"
 	Realtek = "rtl871xdrv"
 )

@@ -16,6 +16,7 @@ type Hostapd struct {
 
 func (h *Hostapd) writeConf() (err error) {
 	driver := ""
+
 	switch h.Driver {
 	case NetLink:
 		driver = "nl80211"

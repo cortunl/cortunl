@@ -4,8 +4,8 @@ type Driver string
 
 const (
 	Auto    Driver = "auto"
-	NetLink Driver = "nl80211"
-	Realtek Driver = "rtl871xdrv"
+	NetLink Driver = "netlink"
+	Realtek Driver = "realtek"
 )
 
 const conf = `driver=%s

@@ -11,3 +11,7 @@ type ReadError struct {
 type WriteError struct {
 	errors.DropboxError
 }
+
+type UnknownError struct {
+	errors.DropboxError
+}

@@ -20,7 +20,7 @@ func (h *Hostapd) writeConf() (err error) {
 	if err != nil {
 		return
 	}
-	h.path = filepath.Join(h.path, "hostapd.conf")
+	h.path = filepath.Join(h.path, confName)
 
 	driver := ""
 	switch h.Driver {

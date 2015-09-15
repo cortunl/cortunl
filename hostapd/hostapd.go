@@ -3,10 +3,11 @@ package hostapd
 import (
 	"fmt"
 	"github.com/cortunl/cortunl/utils"
+	"path/filepath"
 )
 
 type Hostapd struct {
-	Path      string
+	path      string
 	Driver    Driver
 	Ssid      string
 	Interface string
@@ -15,8 +16,13 @@ type Hostapd struct {
 }
 
 func (h *Hostapd) writeConf() (err error) {
-	driver := ""
+	h.path, err = utils.GetTempDir()
+	if err != nil {
+		return
+	}
+	h.path = filepath.Join(h.path, "hostapd.conf")
 
+	driver := ""
 	switch h.Driver {
 	case NetLink:
 		driver = "nl80211"
@@ -33,7 +39,7 @@ func (h *Hostapd) writeConf() (err error) {
 
 	data := fmt.Sprintf(conf, driver, h.Ssid, h.Interface, h.Channel, wpaData)
 
-	err = utils.CreateWrite(h.Path, data)
+	err = utils.CreateWrite(h.path, data)
 	if err != nil {
 		return
 	}

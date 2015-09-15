@@ -46,3 +46,12 @@ func (h *Hostapd) writeConf() (err error) {
 
 	return
 }
+
+func (h *Hostapd) Start() (err error) {
+	err = utils.Exec("hostapd", h.path)
+	if err != nil {
+		return
+	}
+
+	return
+}

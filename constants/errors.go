@@ -15,3 +15,7 @@ type WriteError struct {
 type UnknownError struct {
 	errors.DropboxError
 }
+
+type ExecError struct {
+	errors.DropboxError
+}

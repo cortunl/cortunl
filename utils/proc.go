@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/cortunl/cortunl/constants"
 	"github.com/dropbox/godropbox/errors"
 	"os"
 	"os/exec"
@@ -17,7 +18,7 @@ func Exec(dir, name string, arg ...string) (err error) {
 
 	err = cmd.Run()
 	if err != nil {
-		err = &ExecError{
+		err = &constants.ExecError{
 			errors.Wrapf(err, "utils: Failed to exec '%s'", name),
 		}
 		return
@@ -36,7 +37,7 @@ func ExecOutput(dir, name string, arg ...string) (output string, err error) {
 
 	outputByt, err := cmd.Output()
 	if err != nil {
-		err = &ExecError{
+		err = &constants.ExecError{
 			errors.Wrapf(err, "utils: Failed to exec '%s'", name),
 		}
 		return

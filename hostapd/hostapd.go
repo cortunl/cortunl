@@ -1,13 +1,19 @@
 package hostapd
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/cortunl/cortunl/constants"
 	"github.com/cortunl/cortunl/utils"
+	"github.com/dropbox/godropbox/errors"
+	"os/exec"
 	"path/filepath"
 )
 
 type Hostapd struct {
+	cmd       *exec.Cmd
 	path      string
+	output    *bytes.Buffer
 	Driver    Driver
 	Ssid      string
 	Interface string
@@ -48,8 +54,29 @@ func (h *Hostapd) writeConf() (err error) {
 }
 
 func (h *Hostapd) Start() (err error) {
-	err = utils.Exec("hostapd", h.path)
+	h.output = &bytes.Buffer{}
+
+	h.cmd = exec.Command("hostapd", h.path)
+	h.cmd.Stdout = h.output
+	h.cmd.Stderr = h.output
+
+	err = h.cmd.Start()
 	if err != nil {
+		err = &constants.ExecError{
+			errors.Wrap(err, "hostapd: Failed to exec"),
+		}
+		return
+	}
+
+	return
+}
+
+func (h *Hostapd) Wait() (err error) {
+	err = h.cmd.Wait()
+	if err != nil {
+		err = &constants.ExecError{
+			errors.Wrap(err, "hostapd: Exec error"),
+		}
 		return
 	}
 

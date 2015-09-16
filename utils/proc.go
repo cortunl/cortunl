@@ -29,13 +29,11 @@ func Exec(dir, name string, arg ...string) (err error) {
 
 func ExecOutput(dir, name string, arg ...string) (output string, err error) {
 	cmd := exec.Command(name, arg...)
-	cmd.Stderr = os.Stderr
-
 	if dir != "" {
 		cmd.Dir = dir
 	}
 
-	outputByt, err := cmd.Output()
+	outputByt, err := cmd.CombinedOutput()
 	if err != nil {
 		err = &constants.ExecError{
 			errors.Wrapf(err, "utils: Failed to exec '%s'", name),

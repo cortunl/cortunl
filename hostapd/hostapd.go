@@ -71,6 +71,18 @@ func (h *Hostapd) Start() (err error) {
 	return
 }
 
+func (h *Hostapd) Stop() (err error) {
+	err = h.cmd.Process.Kill()
+	if err != nil {
+		err = &constants.ExecError{
+			errors.Wrap(err, "hostapd: Failed to stop exec"),
+		}
+		return
+	}
+
+	return
+}
+
 func (h *Hostapd) Wait() (err error) {
 	err = h.cmd.Wait()
 	if err != nil {

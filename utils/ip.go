@@ -73,7 +73,7 @@ func IncIp(ip net.IP) {
 	}
 }
 
-func IterNetworkHosts(network *net.IPNet) <-chan net.IP {
+func IterNetwork(network *net.IPNet) <-chan net.IP {
 	iter := make(chan net.IP)
 
 	go func() {
@@ -82,7 +82,7 @@ func IterNetworkHosts(network *net.IPNet) <-chan net.IP {
 		i := 0
 		for ip := ip.Mask(network.Mask); network.Contains(ip); IncIp(ip) {
 			if prev != nil {
-				if i < 3 {
+				if i < 2 {
 					i += 1
 				} else {
 					iter <- prev

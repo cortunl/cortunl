@@ -1,5 +1,9 @@
 package dhcpd
 
+const (
+	confName = "dhcpd.conf"
+)
+
 const conf = `subnet %s netmask %s {
 	range %s %s;
 	option subnet-mask %s;

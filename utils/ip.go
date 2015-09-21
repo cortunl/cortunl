@@ -63,3 +63,36 @@ func GetBroadcast(network *net.IPNet) net.IP {
 	n := int(ipToInt32(network.IP[len(network.IP)-4:]))
 	return int32ToIp(int32(n + offset))
 }
+
+func IncIp(ip net.IP) {
+	for i := len(ip)-1; i >= 0; i-- {
+		ip[i]++
+		if ip[i] > 0 {
+			break
+		}
+	}
+}
+
+func IterNetworkHosts(network *net.IPNet) <-chan net.IP {
+	iter := make(chan net.IP)
+
+	go func() {
+		ip := network.IP
+		prev := make(net.IP, len(ip))
+		i := 0
+		for ip := ip.Mask(network.Mask); network.Contains(ip); IncIp(ip) {
+			if prev != nil {
+				if i < 3 {
+					i += 1
+				} else {
+					iter <- prev
+					prev = make(net.IP, len(ip))
+				}
+			}
+			copy(prev, ip)
+		}
+		close(iter)
+	}()
+
+	return iter
+}

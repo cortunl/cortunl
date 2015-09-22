@@ -21,7 +21,7 @@ func (d *Dhcpd) writeConf() (err error) {
 	}
 	d.path = filepath.Join(d.path, confName)
 
-	broadcast := utils.GetBroadcast(d.Network)
+	broadcast := utils.GetBroadcast(d.Network).String()
 
 	router := ""
 	start := ""
@@ -38,11 +38,11 @@ func (d *Dhcpd) writeConf() (err error) {
 
 	data := fmt.Sprintf(conf,
 		d.Network.IP.String(),
-		broadcast.String(),
+		broadcast,
 		start,
 		end,
 		net.IP(d.Network.Mask).String(),
-		broadcast.String(),
+		broadcast,
 		router,
 		strings.Join([]string{"8.8.8.8", "8.8.4.4"}, ", "),
 	)

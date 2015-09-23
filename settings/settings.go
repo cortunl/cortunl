@@ -6,6 +6,10 @@ var Settings = &SettingsData{
 		"wlan0",
 	},
 	WirelessDriver: "auto",
+	DnsServers: []string{
+		"8.8.8.8",
+		"8.8.4.4",
+	},
 }
 
 type SettingsData struct {
@@ -16,4 +20,5 @@ type SettingsData struct {
 	WirelessSsid     string
 	WirelessPassword string
 	WirelessDriver   string
+	DnsServers       []string
 }

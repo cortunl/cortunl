@@ -2,6 +2,7 @@ package dhcpd
 
 import (
 	"fmt"
+	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
 	"path/filepath"
@@ -44,7 +45,7 @@ func (d *Dhcpd) writeConf() (err error) {
 		net.IP(d.Network.Mask).String(),
 		broadcast,
 		router,
-		strings.Join([]string{"8.8.8.8", "8.8.4.4"}, ", "),
+		strings.Join(settings.Settings.DnsServers, ", "),
 	)
 
 	err = utils.CreateWrite(d.path, data)

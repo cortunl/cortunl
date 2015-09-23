@@ -1,16 +1,21 @@
 package dhcpd
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/cortunl/cortunl/constants"
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
+	"github.com/dropbox/godropbox/errors"
 	"net"
-	"path/filepath"
+	"os/exec"
 	"strings"
 )
 
 type Dhcpd struct {
+	cmd       *exec.Cmd
 	path      string
+	output    *bytes.Buffer
 	Interface string
 	Network   *net.IPNet
 }
@@ -50,6 +55,48 @@ func (d *Dhcpd) writeConf() (err error) {
 
 	err = utils.CreateWrite(d.path, data)
 	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (d *Dhcpd) Start() (err error) {
+	d.output = &bytes.Buffer{}
+
+	d.cmd = exec.Command("dhcpcd", "--config", d.path)
+	d.cmd.Stdout = d.output
+	d.cmd.Stderr = d.output
+
+	err = d.cmd.Start()
+	if err != nil {
+		err = &constants.ExecError{
+			errors.Wrap(err, "dhcpd: Failed to exec"),
+		}
+		return
+	}
+
+	return
+}
+
+func (d *Dhcpd) Stop() (err error) {
+	err = d.cmd.Process.Kill()
+	if err != nil {
+		err = &constants.ExecError{
+			errors.Wrap(err, "dhcpd: Failed to stop exec"),
+		}
+		return
+	}
+
+	return
+}
+
+func (d *Dhcpd) Wait() (err error) {
+	err = d.cmd.Wait()
+	if err != nil {
+		err = &constants.ExecError{
+			errors.Wrap(err, "dhcpd: Exec error"),
+		}
 		return
 	}
 

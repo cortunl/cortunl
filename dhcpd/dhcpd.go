@@ -9,6 +9,7 @@ import (
 	"github.com/dropbox/godropbox/errors"
 	"net"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 

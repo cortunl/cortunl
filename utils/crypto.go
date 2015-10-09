@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/rand"
+	"encoding/hex"
 	"github.com/cortunl/cortunl/constants"
 	"github.com/dropbox/godropbox/errors"
 	"math/big"
@@ -19,6 +20,16 @@ func RandBytes(size int) (bytes []byte, err error) {
 		return
 	}
 
+	return
+}
+
+func Uuid() (id string) {
+	data, err := RandBytes(16)
+	if err != nil {
+		panic(err)
+	}
+
+	id = hex.EncodeToString(data[:])
 	return
 }
 

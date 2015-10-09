@@ -12,7 +12,7 @@ type IpTables struct {
 	rules   [][]string
 }
 
-func (t *IpTables) generateRules() {
+func (t *IpTables) Init() {
 	t.rules = [][]string{
 		[]string{
 			"POSTROUTING",
@@ -50,10 +50,21 @@ func (t *IpTables) generateRules() {
 }
 
 func (t *IpTables) AddRules() (err error) {
-	t.generateRules()
-
 	for _, rule := range t.rules {
 		args := append([]string{"-I"}, rule...)
+
+		err = utils.Exec("", "iptables", args...)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func (t *IpTables) RemoveRules() (err error) {
+	for _, rule := range t.rules {
+		args := append([]string{"-D"}, rule...)
 
 		err = utils.Exec("", "iptables", args...)
 		if err != nil {

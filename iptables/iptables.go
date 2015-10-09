@@ -6,6 +6,44 @@ import (
 )
 
 type IpTables struct {
+	Input  string
+	Output string
+}
+
+func (i *IpTables) getRules() (rules [][]string) {
+	rules = [][]string{
+		[]string{
+			"-t", "nat",
+			"-A", "POSTROUTING",
+			"-o", i.Input,
+			"-j", "MASQUERADE",
+		},
+		[]string{
+			"-A", "FORWARD",
+			"-i", i.Input,
+			"-o", i.Output,
+			"-m", "state",
+			"--state", "RELATED,ESTABLISHED",
+			"-j", "ACCEPT",
+		},
+		[]string{
+			"-A", "FORWARD",
+			"-i", i.Output,
+			"-o", i.Input,
+			"-j", "ACCEPT",
+		},
+	}
+
+	for _, rule := range rules {
+		comment := []string{
+			"-m", "comment",
+			"--comment", fmt.Sprintf("cortunl_%s", utils.Uuid()),
+		}
+
+		rule = append(rule, comment...)
+	}
+
+	return
 }
 
 func (i *IpTables) AddRules() (err error) {

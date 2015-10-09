@@ -6,82 +6,59 @@ import (
 )
 
 type IpTables struct {
-	Input  string
-	Output string
+	Input   string
+	Output  string
+	Network string
+	rules   [][]string
 }
 
-func (i *IpTables) getRules() (rules [][]string) {
-	rules = [][]string{
+func (t *IpTables) generateRules() {
+	t.rules = [][]string{
 		[]string{
+			"POSTROUTING",
 			"-t", "nat",
-			"-A", "POSTROUTING",
-			"-o", i.Input,
+			"-o", t.Input,
 			"-j", "MASQUERADE",
+			"-s", t.Network,
 		},
 		[]string{
-			"-A", "FORWARD",
-			"-i", i.Input,
-			"-o", i.Output,
+			"FORWARD",
+			"-i", t.Input,
+			"-o", t.Output,
 			"-m", "state",
 			"--state", "RELATED,ESTABLISHED",
 			"-j", "ACCEPT",
 		},
 		[]string{
-			"-A", "FORWARD",
-			"-i", i.Output,
-			"-o", i.Input,
+			"FORWARD",
+			"-i", t.Output,
+			"-o", t.Input,
 			"-j", "ACCEPT",
 		},
 	}
 
-	for _, rule := range rules {
+	for i, rule := range t.rules {
 		comment := []string{
 			"-m", "comment",
 			"--comment", fmt.Sprintf("cortunl_%s", utils.Uuid()),
 		}
 
-		rule = append(rule, comment...)
+		t.rules[i] = append(rule, comment...)
 	}
 
 	return
 }
 
-func (i *IpTables) AddRules() (err error) {
-	err = utils.EnableIpForwarding()
-	if err != nil {
-		return
-	}
+func (t *IpTables) AddRules() (err error) {
+	t.generateRules()
 
-	rules := [][]string{
-		[]string{
-			"-t", "nat",
-			"-A", "POSTROUTING",
-			"-o", "eth0",
-			"-j", "MASQUERADE",
-		},
-		[]string{
-			"-A", "FORWARD",
-			"-i", "eth0",
-			"-o", "wlan0",
-			"-m", "state",
-			"--state", "RELATED,ESTABLISHED",
-			"-j", "ACCEPT",
-		},
-		[]string{
-			"-A", "FORWARD",
-			"-i", "wlan0",
-			"-o", "eth0",
-			"-j", "ACCEPT",
-		},
-	}
+	for _, rule := range t.rules {
+		args := append([]string{"-I"}, rule...)
 
-	for _, rule := range rules {
-		comment := []string{
-			"-m", "comment",
-			"--comment", fmt.Sprintf("cortunl_%s", utils.Uuid()),
+		err = utils.Exec("", "iptables", args...)
+		if err != nil {
+			return
 		}
-
-		rule = append(rule, comment...)
 	}
 
 	return

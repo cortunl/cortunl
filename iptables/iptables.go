@@ -3,26 +3,27 @@ package iptables
 import (
 	"fmt"
 	"github.com/cortunl/cortunl/utils"
+	"net"
 )
 
 type IpTables struct {
 	Input    string
 	Output   string
-	Network  string
-	Network6 string
+	Network  *net.IPNet
+	Network6 *net.IPNet
 	rules    [][]string
 	rules6   [][]string
 }
 
 func (t *IpTables) Init() {
-	for i, network := range []string{t.Network, t.Network6} {
+	for i, network := range []*net.IPNet{t.Network, t.Network6} {
 		rules := [][]string{
 			[]string{
 				"POSTROUTING",
 				"-t", "nat",
 				"-o", t.Input,
 				"-j", "MASQUERADE",
-				"-s", network,
+				"-s", network.String(),
 			},
 			[]string{
 				"FORWARD",

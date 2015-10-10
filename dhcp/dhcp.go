@@ -1,4 +1,4 @@
-package dhcpd
+package dhcp
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-type Dhcpd struct {
+type Dhcp struct {
 	cmd       *exec.Cmd
 	path      string
 	output    *bytes.Buffer
@@ -21,7 +21,7 @@ type Dhcpd struct {
 	Network   *net.IPNet
 }
 
-func (d *Dhcpd) writeConf() (err error) {
+func (d *Dhcp) writeConf() (err error) {
 	d.path, err = utils.GetTempDir()
 	if err != nil {
 		return
@@ -62,7 +62,7 @@ func (d *Dhcpd) writeConf() (err error) {
 	return
 }
 
-func (d *Dhcpd) Start() (err error) {
+func (d *Dhcp) Start() (err error) {
 	d.output = &bytes.Buffer{}
 
 	d.cmd = exec.Command("dhcpcd", "--config", d.path)
@@ -80,7 +80,7 @@ func (d *Dhcpd) Start() (err error) {
 	return
 }
 
-func (d *Dhcpd) Stop() (err error) {
+func (d *Dhcp) Stop() (err error) {
 	err = d.cmd.Process.Kill()
 	if err != nil {
 		err = &constants.ExecError{
@@ -92,7 +92,7 @@ func (d *Dhcpd) Stop() (err error) {
 	return
 }
 
-func (d *Dhcpd) Wait() (err error) {
+func (d *Dhcp) Wait() (err error) {
 	err = d.cmd.Wait()
 	if err != nil {
 		err = &constants.ExecError{

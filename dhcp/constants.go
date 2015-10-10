@@ -1,4 +1,4 @@
-package dhcpd
+package dhcp
 
 const (
 	confName = "dhcpd.conf"

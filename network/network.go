@@ -14,7 +14,7 @@ type NetworkType string
 type Network struct {
 	Id   string
 	Name string
-	Net  net.IPNet
+	Net  *net.IPNet
 	Addr net.Addr
 	Type NetworkType
 }

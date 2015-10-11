@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-type Dhcp4 struct {
+type dhcp4 struct {
 	cmd       *exec.Cmd
 	path      string
 	output    *bytes.Buffer
@@ -21,7 +21,7 @@ type Dhcp4 struct {
 	Network   *net.IPNet
 }
 
-func (d *Dhcp4) writeConf() (err error) {
+func (d *dhcp4) writeConf() (err error) {
 	d.path, err = utils.GetTempDir()
 	if err != nil {
 		return
@@ -62,7 +62,7 @@ func (d *Dhcp4) writeConf() (err error) {
 	return
 }
 
-func (d *Dhcp4) Start() (err error) {
+func (d *dhcp4) Start() (err error) {
 	d.output = &bytes.Buffer{}
 
 	d.cmd = exec.Command("dhcpcd", "--config", d.path)
@@ -72,7 +72,7 @@ func (d *Dhcp4) Start() (err error) {
 	err = d.cmd.Start()
 	if err != nil {
 		err = &constants.ExecError{
-			errors.Wrap(err, "dhcpd: Failed to exec"),
+			errors.Wrap(err, "dhcp: Failed to exec dhcpcd"),
 		}
 		return
 	}
@@ -80,11 +80,11 @@ func (d *Dhcp4) Start() (err error) {
 	return
 }
 
-func (d *Dhcp4) Stop() (err error) {
+func (d *dhcp4) Stop() (err error) {
 	err = d.cmd.Process.Kill()
 	if err != nil {
 		err = &constants.ExecError{
-			errors.Wrap(err, "dhcpd: Failed to stop exec"),
+			errors.Wrap(err, "dhcp: Failed to stop dhcpcd"),
 		}
 		return
 	}
@@ -92,11 +92,11 @@ func (d *Dhcp4) Stop() (err error) {
 	return
 }
 
-func (d *Dhcp4) Wait() (err error) {
+func (d *dhcp4) Wait() (err error) {
 	err = d.cmd.Wait()
 	if err != nil {
 		err = &constants.ExecError{
-			errors.Wrap(err, "dhcpd: Exec error"),
+			errors.Wrap(err, "dhcp: Dhcpcd exec error"),
 		}
 		return
 	}

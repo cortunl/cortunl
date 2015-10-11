@@ -64,6 +64,12 @@ func GetBroadcast(network *net.IPNet) net.IP {
 	return int32ToIp(int32(n + offset))
 }
 
+func CopyIp(ip net.IP) (ipc net.IP) {
+	ipc = make(net.IP, len(ip))
+	copy(ipc, ip)
+	return
+}
+
 func IncIp(ip net.IP) {
 	for i := len(ip)-1; i >= 0; i-- {
 		ip[i]++

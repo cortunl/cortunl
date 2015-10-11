@@ -1,7 +1,8 @@
 package dhcp
 
 const (
-	confName = "dhcpd.conf"
+	confName  = "dhcpd.conf"
+	confName6 = "radvd.conf"
 )
 
 const conf = `subnet %s netmask %s {
@@ -13,3 +14,14 @@ const conf = `subnet %s netmask %s {
 	default-lease-time 172800;
 	max-lease-time 172800;
 }`
+
+const conf6 = `interface %s {
+	AdvSendAdvert on;
+	MinRtrAdvInterval 3;
+	MaxRtrAdvInterval 10;
+	prefix %s {
+		AdvOnLink on;
+		AdvAutonomous on;
+		AdvRouterAddr on;
+	};
+};`

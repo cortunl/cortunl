@@ -25,12 +25,12 @@ func (d *Dhcp) Init() {
 }
 
 func (d *Dhcp) Start() (err error) {
-	d.v4.Start()
+	err = d.v4.Start()
 	if err != nil {
 		return
 	}
 
-	d.v6.Start()
+	err = d.v6.Start()
 	if err != nil {
 		return
 	}
@@ -39,12 +39,12 @@ func (d *Dhcp) Start() (err error) {
 }
 
 func (d *Dhcp) Stop() (err error) {
-	d.v4.Stop()
+	err = d.v4.Stop()
 	if err != nil {
 		return
 	}
 
-	d.v6.Stop()
+	err = d.v6.Stop()
 	if err != nil {
 		return
 	}
@@ -53,12 +53,12 @@ func (d *Dhcp) Stop() (err error) {
 }
 
 func (d *Dhcp) Wait() (err error) {
-	d.v4.Wait()
+	err = d.v4.Wait()
 	if err != nil {
 		return
 	}
 
-	d.v6.Wait()
+	err = d.v6.Wait()
 	if err != nil {
 		return
 	}

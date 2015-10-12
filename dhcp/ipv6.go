@@ -1,7 +1,6 @@
 package dhcp
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/cortunl/cortunl/constants"
 	"github.com/cortunl/cortunl/utils"

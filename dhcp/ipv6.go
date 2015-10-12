@@ -40,7 +40,10 @@ func (d *dhcp6) writeConf() (err error) {
 }
 
 func (d *dhcp6) Start() (err error) {
-	d.output = &bytes.Buffer{}
+	err = d.writeConf()
+	if err != nil {
+		return
+	}
 
 	d.cmd = exec.Command("radvd", "--nodaemon", "--config", d.path)
 	d.cmd.Stdout = os.Stdout
@@ -58,6 +61,10 @@ func (d *dhcp6) Start() (err error) {
 }
 
 func (d *dhcp6) Stop() (err error) {
+	if d.cmd == nil {
+		return
+	}
+
 	err = d.cmd.Process.Kill()
 	if err != nil {
 		err = &constants.ExecError{
@@ -70,6 +77,10 @@ func (d *dhcp6) Stop() (err error) {
 }
 
 func (d *dhcp6) Wait() (err error) {
+	if d.cmd == nil {
+		return
+	}
+
 	err = d.cmd.Wait()
 	if err != nil {
 		err = &constants.ExecError{

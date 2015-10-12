@@ -9,6 +9,10 @@ var (
 	reservedBridges set.Set
 )
 
+func init() {
+	reservedBridges = set.NewSet()
+}
+
 func reserveBridge() (bridge string) {
 	for i := 0; ; i++ {
 		bridge = fmt.Sprintf("brc%d", i)

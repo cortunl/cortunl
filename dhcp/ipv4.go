@@ -72,9 +72,9 @@ func (d *dhcp4) Start() (err error) {
 
 	d.output = &bytes.Buffer{}
 
-	d.cmd = exec.Command("dhcpcd", "--config", d.path)
-	d.cmd.Stdout = d.output
-	d.cmd.Stderr = d.output
+	d.cmd = exec.Command("dhcpd", "-f", "-cf", d.path, d.Interface)
+	d.cmd.Stdout = os.Stdout
+	d.cmd.Stderr = os.Stdout
 
 	err = d.cmd.Start()
 	if err != nil {

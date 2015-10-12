@@ -6,6 +6,7 @@ import (
 	"github.com/cortunl/cortunl/constants"
 	"github.com/cortunl/cortunl/utils"
 	"github.com/dropbox/godropbox/errors"
+	"os"
 	"os/exec"
 	"path/filepath"
 )
@@ -54,11 +55,16 @@ func (h *Hostapd) writeConf() (err error) {
 }
 
 func (h *Hostapd) Start() (err error) {
+	err = h.writeConf()
+	if err != nil {
+		return
+	}
+
 	h.output = &bytes.Buffer{}
 
 	h.cmd = exec.Command("hostapd", h.path)
-	h.cmd.Stdout = h.output
-	h.cmd.Stderr = h.output
+	h.cmd.Stdout = os.Stdout
+	h.cmd.Stderr = os.Stdout
 
 	err = h.cmd.Start()
 	if err != nil {
@@ -72,6 +78,10 @@ func (h *Hostapd) Start() (err error) {
 }
 
 func (h *Hostapd) Stop() (err error) {
+	if h.cmd == nil {
+		return
+	}
+
 	err = h.cmd.Process.Kill()
 	if err != nil {
 		err = &constants.ExecError{
@@ -84,6 +94,10 @@ func (h *Hostapd) Stop() (err error) {
 }
 
 func (h *Hostapd) Wait() (err error) {
+	if h.cmd == nil {
+		return
+	}
+
 	err = h.cmd.Wait()
 	if err != nil {
 		err = &constants.ExecError{

@@ -13,6 +13,7 @@ func EnableIpForwarding() (err error) {
 		}
 		return
 	}
+
 	err = Exec("", "sysctl", "-w", "net.ipv6.conf.all.forwarding=1")
 	if err != nil {
 		err = &constants.ExecError{

@@ -7,6 +7,7 @@ import (
 	"github.com/cortunl/cortunl/utils"
 	"github.com/dropbox/godropbox/errors"
 	"net"
+	"os"
 	"os/exec"
 	"path/filepath"
 )
@@ -14,7 +15,6 @@ import (
 type dhcp6 struct {
 	cmd       *exec.Cmd
 	path      string
-	output    *bytes.Buffer
 	Interface string
 	Network6  *net.IPNet
 }
@@ -42,9 +42,9 @@ func (d *dhcp6) writeConf() (err error) {
 func (d *dhcp6) Start() (err error) {
 	d.output = &bytes.Buffer{}
 
-	d.cmd = exec.Command("radvd", "--config", d.path)
-	d.cmd.Stdout = d.output
-	d.cmd.Stderr = d.output
+	d.cmd = exec.Command("radvd", "--nodaemon", "--config", d.path)
+	d.cmd.Stdout = os.Stdout
+	d.cmd.Stderr = os.Stdout
 
 	err = d.cmd.Start()
 	if err != nil {

@@ -70,6 +70,16 @@ func CopyIp(ip net.IP) (ipc net.IP) {
 	return
 }
 
+func CopyNetwork(network *net.IPNet) (networkc *net.IPNet) {
+	networkc = &net.IPNet{
+		IP: make(net.IP, len(network.IP)),
+		Mask: make(net.IPMask, len(network.Mask)),
+	}
+	copy(networkc.IP, network.IP)
+	copy(networkc.Mask, network.Mask)
+	return
+}
+
 func IncIp(ip net.IP) {
 	for i := len(ip)-1; i >= 0; i-- {
 		ip[i]++

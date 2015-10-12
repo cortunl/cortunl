@@ -3,6 +3,7 @@ package bridge
 import (
 	"github.com/cortunl/cortunl/utils"
 	"net"
+	"fmt"
 )
 
 type Bridge struct {
@@ -54,6 +55,18 @@ func (b *Bridge) Start() (err error) {
 
 	err = utils.Exec("", "ip", "-6", "addr", "add", addr6.String(),
 		"dev", b.Bridge)
+	if err != nil {
+		return
+	}
+
+	err = utils.Exec("", "sysctl", "-w",
+		fmt.Sprintf("net.ipv6.conf.%s.autoconf=0", b.Bridge))
+	if err != nil {
+		return
+	}
+
+	err = utils.Exec("", "sysctl", "-w",
+		fmt.Sprintf("net.ipv6.conf.%s.accept_ra=0", b.Bridge))
 	if err != nil {
 		return
 	}

@@ -100,11 +100,6 @@ func (d *dhcp4) Stop() (err error) {
 		return
 	}
 
-	err = d.Wait()
-	if err != nil {
-		return
-	}
-
 	return
 }
 

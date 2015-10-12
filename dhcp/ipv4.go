@@ -8,6 +8,7 @@ import (
 	"github.com/cortunl/cortunl/utils"
 	"github.com/dropbox/godropbox/errors"
 	"net"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -29,6 +30,7 @@ func (d *dhcp4) writeConf() (err error) {
 	d.path = filepath.Join(d.path, confName)
 
 	broadcast := utils.GetBroadcast(d.Network).String()
+	mask := net.IP(d.Network.Mask).String()
 
 	router := ""
 	start := ""
@@ -45,10 +47,10 @@ func (d *dhcp4) writeConf() (err error) {
 
 	data := fmt.Sprintf(conf,
 		d.Network.IP.String(),
-		broadcast,
+		mask,
 		start,
 		end,
-		net.IP(d.Network.Mask).String(),
+		mask,
 		broadcast,
 		router,
 		strings.Join(settings.Settings.DnsServers, ", "),

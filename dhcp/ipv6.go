@@ -26,7 +26,7 @@ func (d *dhcp6) writeConf() (err error) {
 	}
 	d.path = filepath.Join(d.path, confName6)
 
-	data := fmt.Sprintf(conf,
+	data := fmt.Sprintf(conf6,
 		d.Interface,
 		d.Network6.String(),
 	)

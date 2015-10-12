@@ -65,6 +65,11 @@ func (d *dhcp4) writeConf() (err error) {
 }
 
 func (d *dhcp4) Start() (err error) {
+	err = d.writeConf()
+	if err != nil {
+		return
+	}
+
 	d.output = &bytes.Buffer{}
 
 	d.cmd = exec.Command("dhcpcd", "--config", d.path)

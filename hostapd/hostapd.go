@@ -16,8 +16,8 @@ type Hostapd struct {
 	path      string
 	output    *bytes.Buffer
 	Driver    Driver
-	Ssid      string
 	Interface string
+	Ssid      string
 	Channel   int
 	Password  string
 }

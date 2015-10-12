@@ -24,20 +24,6 @@ func (d *Dhcp) Init() {
 	}
 }
 
-func (d *Dhcp) writeConf() (err error) {
-	d.v4.writeConf()
-	if err != nil {
-		return
-	}
-
-	d.v6.writeConf()
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 func (d *Dhcp) Start() (err error) {
 	d.v4.Start()
 	if err != nil {

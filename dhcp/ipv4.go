@@ -88,6 +88,10 @@ func (d *dhcp4) Start() (err error) {
 }
 
 func (d *dhcp4) Stop() (err error) {
+	if d.cmd == nil {
+		return
+	}
+
 	err = d.cmd.Process.Kill()
 	if err != nil {
 		err = &constants.ExecError{
@@ -96,10 +100,19 @@ func (d *dhcp4) Stop() (err error) {
 		return
 	}
 
+	err = d.Wait()
+	if err != nil {
+		return
+	}
+
 	return
 }
 
 func (d *dhcp4) Wait() (err error) {
+	if d.cmd == nil {
+		return
+	}
+
 	err = d.cmd.Wait()
 	if err != nil {
 		err = &constants.ExecError{

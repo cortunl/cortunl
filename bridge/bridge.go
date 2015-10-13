@@ -1,9 +1,9 @@
 package bridge
 
 import (
+	"fmt"
 	"github.com/cortunl/cortunl/utils"
 	"net"
-	"fmt"
 )
 
 type Bridge struct {
@@ -21,16 +21,16 @@ func (b *Bridge) Start() (err error) {
 		return
 	}
 
-	for _, intf := range b.Interfaces {
-		_ = utils.Exec("", "ip", "addr", "flush", "dev", intf)
-		_ = utils.Exec("", "ip", "link", "set", "dev", intf, "down")
+	for _, iface := range b.Interfaces {
+		_ = utils.Exec("", "ip", "link", "set", "dev", iface, "down")
+		_ = utils.Exec("", "ip", "addr", "flush", "dev", iface)
 
-		err = utils.Exec("", "ip", "link", "set", "dev", intf, "up")
+		err = utils.Exec("", "ip", "link", "set", "dev", iface, "up")
 		if err != nil {
 			return
 		}
 
-		err = utils.Exec("", "brctl", "addif", b.Bridge, intf)
+		err = utils.Exec("", "brctl", "addif", b.Bridge, iface)
 		if err != nil {
 			return
 		}

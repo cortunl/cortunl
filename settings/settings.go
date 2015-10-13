@@ -10,6 +10,10 @@ var Settings = &SettingsData{
 		"8.8.8.8",
 		"8.8.4.4",
 	},
+	DnsServers6: []string{
+		"2001:4860:4860::8888",
+		"2001:4860:4860::8844",
+	},
 }
 
 type SettingsData struct {
@@ -21,4 +25,5 @@ type SettingsData struct {
 	WirelessPassword string
 	WirelessDriver   string
 	DnsServers       []string
+	DnsServers6      []string
 }

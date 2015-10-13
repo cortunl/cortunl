@@ -7,12 +7,13 @@ import (
 )
 
 type IpTables struct {
+	state    bool
+	rules    [][]string
+	rules6   [][]string
 	Input    string
 	Output   string
 	Network  *net.IPNet
 	Network6 *net.IPNet
-	rules    [][]string
-	rules6   [][]string
 }
 
 func (t *IpTables) Init() {
@@ -88,6 +89,11 @@ func (t *IpTables) run(mode string, force bool) (err error) {
 }
 
 func (t *IpTables) AddRules() (err error) {
+	if t.state {
+		return
+	}
+	t.state = true
+
 	err = t.run("-I", false)
 	if err != nil {
 		return
@@ -97,6 +103,11 @@ func (t *IpTables) AddRules() (err error) {
 }
 
 func (t *IpTables) RemoveRules() (err error) {
+	if !t.state {
+		return
+	}
+	t.state = false
+
 	err = t.run("-D", true)
 	if err != nil {
 		return

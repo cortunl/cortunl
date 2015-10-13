@@ -16,6 +16,7 @@ type Hostapd struct {
 	path      string
 	output    *bytes.Buffer
 	Driver    Driver
+	Bridge    string
 	Interface string
 	Ssid      string
 	Channel   int
@@ -44,7 +45,14 @@ func (h *Hostapd) writeConf() (err error) {
 		wpaData = fmt.Sprintf(wpaConf, h.Password)
 	}
 
-	data := fmt.Sprintf(conf, driver, h.Ssid, h.Interface, h.Channel, wpaData)
+	data := fmt.Sprintf(conf,
+		driver,
+		h.Ssid,
+		h.Interface,
+		h.Bridge,
+		h.Channel,
+		wpaData,
+	)
 
 	err = utils.CreateWrite(h.path, data)
 	if err != nil {

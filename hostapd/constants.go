@@ -12,6 +12,8 @@ const (
 const conf = `driver=%s
 ssid=%s
 interface=%s
+#bridge=%s
+hw_mode=g
 channel=%d%s`
 
 const wpaConf = `

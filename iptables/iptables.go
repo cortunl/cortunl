@@ -60,7 +60,7 @@ func (t *IpTables) Init() {
 	return
 }
 
-func (t *IpTables) run(mode string) (err error) {
+func (t *IpTables) run(mode string, force bool) (err error) {
 	for i, exec := range []string{"iptables", "ip6tables"} {
 		var rules [][]string
 
@@ -75,7 +75,11 @@ func (t *IpTables) run(mode string) (err error) {
 
 			err = utils.Exec("", exec, args...)
 			if err != nil {
-				return
+				if force {
+					err = nil
+				} else {
+					return
+				}
 			}
 		}
 	}
@@ -84,7 +88,7 @@ func (t *IpTables) run(mode string) (err error) {
 }
 
 func (t *IpTables) AddRules() (err error) {
-	err = t.run("-I")
+	err = t.run("-I", false)
 	if err != nil {
 		return
 	}
@@ -93,7 +97,7 @@ func (t *IpTables) AddRules() (err error) {
 }
 
 func (t *IpTables) RemoveRules() (err error) {
-	err = t.run("-D")
+	err = t.run("-D", true)
 	if err != nil {
 		return
 	}

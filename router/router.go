@@ -5,9 +5,10 @@ import (
 	"github.com/cortunl/cortunl/dhcp"
 	"github.com/cortunl/cortunl/hostapd"
 	"github.com/cortunl/cortunl/iptables"
+	"github.com/cortunl/cortunl/utils"
 	"net"
 	"strings"
-	"github.com/cortunl/cortunl/utils"
+	"time"
 )
 
 type Router struct {
@@ -80,6 +81,8 @@ func (r *Router) Start() (err error) {
 			return
 		}
 	}
+
+	time.Sleep(1 * time.Second)
 
 	r.dhcpServer.Interface = r.bridge
 	r.dhcpServer.Init()

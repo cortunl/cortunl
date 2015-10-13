@@ -74,6 +74,7 @@ func (r *Router) Start() (err error) {
 	r.bridge = r.bridgeServer.Bridge
 
 	for _, hostapdServer := range r.hostapdServers {
+		hostapdServer.Bridge = r.bridge
 		err = hostapdServer.Start()
 		if err != nil {
 			return

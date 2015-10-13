@@ -85,7 +85,6 @@ func (r *Router) Start() (err error) {
 	time.Sleep(1 * time.Second)
 
 	r.dhcpServer.Interface = r.bridge
-	r.dhcpServer.Init()
 	err = r.dhcpServer.Start()
 	if err != nil {
 		return

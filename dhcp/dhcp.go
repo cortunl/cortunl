@@ -69,7 +69,7 @@ func (d *Dhcp) writeConf() (path string, err error) {
 		settings.Settings.DnsServers6[0],
 	)
 
-	err = utils.CreateWrite(path, data)
+	err = utils.Write(path, data)
 	if err != nil {
 		return
 	}

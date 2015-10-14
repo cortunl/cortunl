@@ -50,7 +50,7 @@ func (h *Hostapd) writeConf() (path string, err error) {
 		wpaData,
 	)
 
-	err = utils.CreateWrite(path, data)
+	err = utils.Write(path, data)
 	if err != nil {
 		return
 	}

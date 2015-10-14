@@ -31,7 +31,7 @@ func MkdirAll(path string) (err error) {
 	return
 }
 
-func CreateWrite(path string, data string) (err error) {
+func Write(path string, data string) (err error) {
 	file, err := Create(path)
 	if err != nil {
 		return

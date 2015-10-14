@@ -1,8 +1,18 @@
 package utils
 
 import (
+	"github.com/cortunl/cortunl/constants"
+	"github.com/dropbox/godropbox/errors"
 	"net"
+	"strings"
 )
+
+type InterfaceAddr struct {
+	Address  net.IP
+	Network  *net.IPNet
+	Address6 net.IP
+	Network6 *net.IPNet
+}
 
 var offsets = [...]int{
 	0,
@@ -72,7 +82,7 @@ func CopyIp(ip net.IP) (ipc net.IP) {
 
 func CopyNetwork(network *net.IPNet) (networkc *net.IPNet) {
 	networkc = &net.IPNet{
-		IP: make(net.IP, len(network.IP)),
+		IP:   make(net.IP, len(network.IP)),
 		Mask: make(net.IPMask, len(network.Mask)),
 	}
 	copy(networkc.IP, network.IP)
@@ -81,7 +91,7 @@ func CopyNetwork(network *net.IPNet) (networkc *net.IPNet) {
 }
 
 func IncIp(ip net.IP) {
-	for i := len(ip)-1; i >= 0; i-- {
+	for i := len(ip) - 1; i >= 0; i-- {
 		ip[i]++
 		if ip[i] > 0 {
 			break
@@ -111,4 +121,52 @@ func IterNetwork(network *net.IPNet) <-chan net.IP {
 	}()
 
 	return iter
+}
+
+func GetInterfaceAddr(iface string) (ifaceAddr *InterfaceAddr, err error) {
+	ifaceAddr = &InterfaceAddr{}
+
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		err = constants.ReadError{
+			errors.Wrap(err, "utils: Failed to read network interfaces"),
+		}
+		return
+	}
+
+	for _, itf := range ifaces {
+		if itf.Name != iface {
+			continue
+		}
+
+		addrs, e := itf.Addrs()
+		if e != nil {
+			err = constants.ReadError{
+				errors.Wrap(e, "utils: Failed to read network addresses"),
+			}
+			return
+		}
+
+		for _, addr := range addrs {
+			adr, network, e := net.ParseCIDR(addr.String())
+			if e != nil {
+				err = constants.UnknownError{
+					errors.Wrap(e, "utils: Failed to parse network"),
+				}
+				return
+			}
+
+			if strings.Contains(adr.String(), ":") {
+				if ifaceAddr.Network6 == nil {
+					ifaceAddr.Address6 = adr
+					ifaceAddr.Network6 = network
+				}
+			} else if ifaceAddr.Network == nil {
+				ifaceAddr.Address = adr
+				ifaceAddr.Network = network
+			}
+		}
+	}
+
+	return
 }

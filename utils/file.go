@@ -3,9 +3,23 @@ package utils
 import (
 	"github.com/cortunl/cortunl/constants"
 	"github.com/dropbox/godropbox/errors"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
+
+func Read(path string) (data string, err error) {
+	dataByt, err := ioutil.ReadFile(path)
+	if err != nil {
+		err = &constants.ReadError{
+			errors.Wrapf(err, "utils: Failed to read '%s'", path),
+		}
+		return
+	}
+	data = string(dataByt)
+
+	return
+}
 
 func Create(path string) (file *os.File, err error) {
 	file, err = os.Create(path)

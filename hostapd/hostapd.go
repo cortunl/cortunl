@@ -1,20 +1,16 @@
 package hostapd
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/cortunl/cortunl/constants"
+	"github.com/cortunl/cortunl/runner"
 	"github.com/cortunl/cortunl/utils"
-	"github.com/dropbox/godropbox/errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 )
 
 type Hostapd struct {
-	cmd       *exec.Cmd
-	path      string
-	output    *bytes.Buffer
+	runner.Runner
 	Driver    Driver
 	Bridge    string
 	Interface string
@@ -23,12 +19,12 @@ type Hostapd struct {
 	Password  string
 }
 
-func (h *Hostapd) writeConf() (err error) {
-	h.path, err = utils.GetTempDir()
+func (h *Hostapd) writeConf() (path string, err error) {
+	path, err = utils.GetTempDir()
 	if err != nil {
 		return
 	}
-	h.path = filepath.Join(h.path, confName)
+	path = filepath.Join(path, confName)
 
 	driver := ""
 	switch h.Driver {
@@ -54,7 +50,7 @@ func (h *Hostapd) writeConf() (err error) {
 		wpaData,
 	)
 
-	err = utils.CreateWrite(h.path, data)
+	err = utils.CreateWrite(path, data)
 	if err != nil {
 		return
 	}
@@ -63,54 +59,16 @@ func (h *Hostapd) writeConf() (err error) {
 }
 
 func (h *Hostapd) Start() (err error) {
-	err = h.writeConf()
+	path, err := h.writeConf()
 	if err != nil {
 		return
 	}
 
-	h.output = &bytes.Buffer{}
-
-	h.cmd = exec.Command("hostapd", h.path)
-	h.cmd.Stdout = os.Stdout
-	h.cmd.Stderr = os.Stdout
-
-	err = h.cmd.Start()
+	cmd := exec.Command("hostapd", path)
+	err = h.Run(cmd, func() {
+		os.RemoveAll(filepath.Dir(path))
+	})
 	if err != nil {
-		err = &constants.ExecError{
-			errors.Wrap(err, "hostapd: Failed to exec"),
-		}
-		return
-	}
-
-	return
-}
-
-func (h *Hostapd) Stop() (err error) {
-	if h.cmd == nil {
-		return
-	}
-
-	err = h.cmd.Process.Kill()
-	if err != nil {
-		err = &constants.ExecError{
-			errors.Wrap(err, "hostapd: Failed to stop exec"),
-		}
-		return
-	}
-
-	return
-}
-
-func (h *Hostapd) Wait() (err error) {
-	if h.cmd == nil {
-		return
-	}
-
-	err = h.cmd.Wait()
-	if err != nil {
-		err = &constants.ExecError{
-			errors.Wrap(err, "hostapd: Exec error"),
-		}
 		return
 	}
 

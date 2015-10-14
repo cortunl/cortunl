@@ -17,7 +17,6 @@ func (b *Bridge) Start() (err error) {
 	if b.Bridge != "" {
 		panic("bridge: Bridge already started")
 	}
-
 	b.Bridge = reserveBridge()
 
 	err = utils.Exec("", "brctl", "addbr", b.Bridge)

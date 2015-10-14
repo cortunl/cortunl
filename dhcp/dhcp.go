@@ -2,10 +2,9 @@ package dhcp
 
 import (
 	"fmt"
-	"github.com/cortunl/cortunl/constants"
+	"github.com/cortunl/cortunl/runner"
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
-	"github.com/dropbox/godropbox/errors"
 	"net"
 	"os"
 	"os/exec"
@@ -14,19 +13,18 @@ import (
 )
 
 type Dhcp struct {
-	cmd       *exec.Cmd
-	path      string
+	runner.Runner
 	Interface string
 	Network   *net.IPNet
 	Network6  *net.IPNet
 }
 
-func (d *Dhcp) writeConf() (err error) {
-	d.path, err = utils.GetTempDir()
+func (d *Dhcp) writeConf() (path string, err error) {
+	path, err = utils.GetTempDir()
 	if err != nil {
 		return
 	}
-	d.path = filepath.Join(d.path, confName)
+	path = filepath.Join(path, confName)
 
 	mask := net.IP(d.Network.Mask).String()
 	router := ""
@@ -71,7 +69,7 @@ func (d *Dhcp) writeConf() (err error) {
 		settings.Settings.DnsServers6[0],
 	)
 
-	err = utils.CreateWrite(d.path, data)
+	err = utils.CreateWrite(path, data)
 	if err != nil {
 		return
 	}
@@ -80,53 +78,17 @@ func (d *Dhcp) writeConf() (err error) {
 }
 
 func (d *Dhcp) Start() (err error) {
-	err = d.writeConf()
+	path, err := d.writeConf()
 	if err != nil {
 		return
 	}
 
-	d.cmd = exec.Command("dnsmasq", "--keep-in-foreground",
-		fmt.Sprintf("--conf-file=%s", d.path))
-	d.cmd.Stdout = os.Stdout
-	d.cmd.Stderr = os.Stdout
-
-	err = d.cmd.Start()
+	cmd := exec.Command("dnsmasq", "--keep-in-foreground",
+		fmt.Sprintf("--conf-file=%s", path))
+	err = d.Run(cmd, func() {
+		os.RemoveAll(filepath.Dir(path))
+	})
 	if err != nil {
-		err = &constants.ExecError{
-			errors.Wrap(err, "dhcp: Failed to exec dnsmasq"),
-		}
-		return
-	}
-
-	return
-}
-
-func (d *Dhcp) Stop() (err error) {
-	if d.cmd == nil {
-		return
-	}
-
-	err = d.cmd.Process.Kill()
-	if err != nil {
-		err = &constants.ExecError{
-			errors.Wrap(err, "dhcp: Failed to stop dnsmasq"),
-		}
-		return
-	}
-
-	return
-}
-
-func (d *Dhcp) Wait() (err error) {
-	if d.cmd == nil {
-		return
-	}
-
-	err = d.cmd.Wait()
-	if err != nil {
-		err = &constants.ExecError{
-			errors.Wrap(err, "dhcp: Dnsmasq exec error"),
-		}
 		return
 	}
 

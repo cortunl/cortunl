@@ -5,6 +5,7 @@ import (
 	"github.com/cortunl/cortunl/dhcp"
 	"github.com/cortunl/cortunl/hostapd"
 	"github.com/cortunl/cortunl/iptables"
+	"github.com/cortunl/cortunl/routes"
 	"github.com/cortunl/cortunl/utils"
 	"net"
 	"strings"
@@ -20,6 +21,7 @@ type Router struct {
 	Password       string
 	bridge         string
 	bridgeServer   *bridge.Bridge
+	routes         *routes.Routes
 	dhcpServer     *dhcp.Dhcp
 	hostapdServers []*hostapd.Hostapd
 	iptables       *iptables.IpTables
@@ -32,6 +34,12 @@ func (r *Router) Init() {
 		Network:    r.Network,
 		Network6:   r.Network6,
 		Interfaces: r.Outputs,
+	}
+
+	r.routes = &routes.Routes{
+		Input:    r.Inputs[0], // TODO
+		Network:  r.Network,
+		Network6: r.Network6,
 	}
 
 	for _, output := range r.Outputs {
@@ -73,6 +81,12 @@ func (r *Router) Start() (err error) {
 		return
 	}
 	r.bridge = r.bridgeServer.Bridge
+
+	r.routes.Output = r.bridge
+	err = r.routes.AddRoutes()
+	if err != nil {
+		return
+	}
 
 	for _, hostapdServer := range r.hostapdServers {
 		hostapdServer.Bridge = r.bridge

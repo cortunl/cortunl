@@ -57,6 +57,8 @@ func (d *Dhcp) writeConf() (path string, err error) {
 	data := fmt.Sprintf(conf,
 		servers,
 		d.Interface,
+		settings.Settings.LocalDomain,
+		settings.Settings.LocalDomain,
 		start,
 		end,
 		mask,

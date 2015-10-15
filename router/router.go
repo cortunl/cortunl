@@ -120,6 +120,11 @@ func (r *Router) Stop() (err error) {
 		return
 	}
 
+	err = r.routes.RemoveRoutes()
+	if err != nil {
+		return
+	}
+
 	for _, hostapdServer := range r.hostapdServers {
 		err = hostapdServer.Stop()
 		if err != nil {

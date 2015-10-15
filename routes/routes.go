@@ -21,19 +21,17 @@ func (r *Routes) createTable() (err error) {
 		return
 	}
 
-	if strings.Contains(data, fmt.Sprintf("%s\n", r.table.Name)) {
-		return
-	}
+	if !strings.Contains(data, fmt.Sprintf("%s\n", r.table.Name)) {
+		if !strings.HasSuffix(data, "\n") {
+			data += "\n"
+		}
 
-	if !strings.HasSuffix(data, "\n") {
-		data += "\n"
-	}
+		data += fmt.Sprintf("%d %s\n", r.table.Num, r.table.Name)
 
-	data += fmt.Sprintf("%d %s\n", r.table.Num, r.table.Name)
-
-	err = utils.Write(tablesPath, data)
-	if err != nil {
-		return
+		err = utils.Write(tablesPath, data)
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -60,23 +58,82 @@ func (r *Routes) removeTable() (err error) {
 	return
 }
 
+func (r *Routes) getRoutes() (routes [][]string, err error) {
+	routes = [][]string{}
+
+	inputAddr, err := utils.GetInterfaceAddr(r.Input)
+	if err != nil {
+		return
+	}
+
+	routes = append(routes, []string{
+		"table", r.table.Name,
+		"default", "via",
+		inputAddr.Gateway.String(),
+	})
+
+	routes = append(routes, []string{
+		"table", r.table.Name,
+		inputAddr.Network.String(),
+		"dev", r.Input,
+	})
+
+	routes = append(routes, []string{
+		"table", r.table.Name,
+		inputAddr.Gateway.String(),
+		"dev", r.Input,
+	})
+
+	routes = append(routes, []string{
+		"table", r.table.Name,
+		r.Network.String(),
+		"dev", r.Output,
+	})
+
+	return
+}
+
 func (r *Routes) AddRoutes() (err error) {
 	if r.table != nil {
 		panic("routes: Routes already added")
 	}
 	r.table = reserveTable()
+
+	err = r.createTable()
+	if err != nil {
+		return
+	}
+
+	routes, err := r.getRoutes()
+	if err != nil {
+		return
+	}
+
+	for _, args := range routes {
+		args = append([]string{"route", "add"}, args...)
+		err = utils.Exec("", "ip", args...)
+		if err != nil {
+			return
+		}
+	}
+
 	return
 }
 
 func (r *Routes) RemoveRoutes() (err error) {
-	if r.table != nil {
-		panic("routes: Routes already added")
+	if r.table == nil {
+		return
 	}
-	r.table = reserveTable()
+	defer r.removeTable()
 
-	err = r.removeTable()
+	routes, err := r.getRoutes()
 	if err != nil {
 		return
+	}
+
+	for _, args := range routes {
+		args = append([]string{"route", "del"}, args...)
+		_ = utils.Exec("", "ip", args...)
 	}
 
 	return

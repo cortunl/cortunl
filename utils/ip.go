@@ -11,8 +11,10 @@ import (
 )
 
 type InterfaceAddr struct {
+	Gateway  net.IP
 	Address  net.IP
 	Network  *net.IPNet
+	Gateway6 net.IP
 	Address6 net.IP
 	Network6 *net.IPNet
 }
@@ -178,6 +180,11 @@ func GetGateways() (gateways map[string]net.IP, err error) {
 }
 
 func GetInterfaceAddr(iface string) (ifaceAddr *InterfaceAddr, err error) {
+	gateways, err := GetGateways()
+	if err != nil {
+		return
+	}
+
 	ifaceAddr = &InterfaceAddr{}
 
 	ifaces, err := net.Interfaces()
@@ -216,6 +223,7 @@ func GetInterfaceAddr(iface string) (ifaceAddr *InterfaceAddr, err error) {
 					ifaceAddr.Network6 = network
 				}
 			} else if ifaceAddr.Network == nil {
+				ifaceAddr.Gateway = gateways[itf.Name]
 				ifaceAddr.Address = adr
 				ifaceAddr.Network = network
 			}

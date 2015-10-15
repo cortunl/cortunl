@@ -1,6 +1,7 @@
 package settings
 
 var Settings = &SettingsData{
+	LocalDomain:   "network",
 	ExternalWired: []string{},
 	ExternalWireless: []string{
 		"wlan0",
@@ -17,6 +18,7 @@ var Settings = &SettingsData{
 }
 
 type SettingsData struct {
+	LocalDomain      string
 	ExternalWired    []string
 	ExternalWireless []string
 	InternalWired    []string

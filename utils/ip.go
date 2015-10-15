@@ -234,5 +234,14 @@ func GetInterfaceAddr(iface string) (ifaceAddr *InterfaceAddr, err error) {
 		}
 	}
 
+	if ifaceAddr.Gateway == nil || ifaceAddr.Network == nil ||
+		ifaceAddr.Gateway6 == nil || ifaceAddr.Network6 == nil {
+
+		err = constants.ReadError{
+			errors.New("utils: Failed to find network interface information"),
+		}
+		return
+	}
+
 	return
 }

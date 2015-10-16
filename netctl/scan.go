@@ -8,6 +8,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"github.com/cortunl/cortunl/settings"
 )
 
 func parseField(line, field string) (val string, err error) {
@@ -24,8 +25,8 @@ func parseField(line, field string) (val string, err error) {
 	return
 }
 
-func GetNetworks(iface string) (networks []*network.WirelessNetwork,
-	err error) {
+func GetNetworks() (networks []*network.WirelessNetwork, err error) {
+	iface := settings.Settings.InputWireless
 
 	err = utils.Exec("", "ip", "link", "set", iface, "up")
 	if err != nil {
@@ -51,6 +52,9 @@ func GetNetworks(iface string) (networks []*network.WirelessNetwork,
 			}
 
 			netwk = &network.WirelessNetwork{
+				Network: &network.Network{
+					Interface: iface,
+				},
 				Mac: val,
 			}
 			networks = append(networks, netwk)

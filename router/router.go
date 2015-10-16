@@ -48,10 +48,10 @@ func (r *Router) Init() {
 		}
 
 		server := &hostapd.Hostapd{
-			Driver:    hostapd.Realtek, // TODO
+			Driver:    hostapd.AutoDrv,
 			Interface: output,
 			Ssid:      r.Ssid,
-			Channel:   1, // TODO
+			Channel:   hostapd.AutoChan,
 			Password:  r.Password,
 		}
 

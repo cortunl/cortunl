@@ -12,11 +12,12 @@ const (
 type NetworkType string
 
 type Network struct {
-	Id       string
-	Name     string
-	Network  *net.IPNet
-	Address  net.IP
-	Network6 *net.IPNet
-	Address6 net.IP
-	Type     NetworkType
+	Id        string
+	Name      string
+	Interface string
+	Network   *net.IPNet
+	Address   net.IP
+	Network6  *net.IPNet
+	Address6  net.IP
+	Type      NetworkType
 }

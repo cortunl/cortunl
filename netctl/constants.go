@@ -1,7 +1,12 @@
 package netctl
 
-const conf = `Description="Cortunl Connection"
+const (
+	confName = "cortunl"
+	confPath = "/etc/netctl/" + confName
+)
+
+const conf = `Description='Cortunl Connection'
 Connection=%s
 Interface=%s
 IP=dhcp
-ESSID="%s"`
+`

@@ -3,7 +3,7 @@ package hostapd
 type Driver string
 
 const (
-	Auto     Driver = "auto"
+	AutoDrv  Driver = "auto"
 	NetLink  Driver = "netlink"
 	Realtek  Driver = "realtek"
 	confName        = "hostapd.conf"

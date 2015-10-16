@@ -17,7 +17,7 @@ type WpaSecurity struct {
 
 func (s *WpaSecurity) Init() {
 	s.props = map[string]string{}
-	s.props["enctype"] = "wpa"
+	s.props["Security"] = "wpa"
 }
 
 func (s *WpaSecurity) Type() string {
@@ -37,7 +37,7 @@ func (s *WpaSecurity) Set(key, val string) (err error) {
 			}
 			return
 		}
-		s.props["key"] = val
+		s.props["Key"] = val
 	default:
 		err = &UnknownError{
 			errors.New("security.wpa: Unknown security parameter"),

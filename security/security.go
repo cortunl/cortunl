@@ -10,8 +10,10 @@ type Security interface {
 
 func GetSecurity(typ string) (intf Security) {
 	switch typ {
-	case "wpa", "wpa2":
+	case "open":
 		intf = &WpaSecurity{}
+	case "wpa", "wpa2":
+		intf = &OpenSecurity{}
 	}
 
 	if intf != nil {

@@ -86,10 +86,11 @@ func (h *Hostapd) Start() (err error) {
 	}
 
 	bin := ""
-	if h.Driver == Realtek {
-		bin = "hostapd_rtl"
-	} else {
+	switch h.getDriver() {
+	case NetLink:
 		bin = "hostapd"
+	case Realtek:
+		bin = "hostapd_rtl"
 	}
 
 	cmd := exec.Command(bin, path)

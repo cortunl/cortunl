@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 )
 
 type Hostapd struct {
@@ -19,6 +20,23 @@ type Hostapd struct {
 	Password  string
 }
 
+func (h *Hostapd) getDriver() (drv Driver) {
+	switch h.Driver {
+	case NetLink:
+		drv = NetLink
+	case Realtek:
+		drv = Realtek
+	default:
+		if runtime.GOARCH == "arm" {
+			drv = Realtek
+		} else {
+			drv = NetLink
+		}
+	}
+
+	return
+}
+
 func (h *Hostapd) writeConf() (path string, err error) {
 	path, err = utils.GetTempDir()
 	if err != nil {
@@ -27,13 +45,11 @@ func (h *Hostapd) writeConf() (path string, err error) {
 	path = filepath.Join(path, confName)
 
 	driver := ""
-	switch h.Driver {
+	switch h.getDriver() {
 	case NetLink:
 		driver = "nl80211"
 	case Realtek:
 		driver = "rtl871xdrv"
-	default:
-		driver = "nl80211"
 	}
 
 	wpaData := ""

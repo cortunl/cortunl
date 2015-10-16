@@ -11,6 +11,30 @@ var (
 	lock = sync.Mutex{}
 )
 
+func connectWired(netwk *network.WiredNetwork) (err error) {
+	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
+
+	lock.Lock()
+	defer lock.Unlock()
+
+	data := fmt.Sprintf(conf,
+		"wired",
+		netwk.Interface,
+	)
+
+	err = utils.Write(confPath, data)
+	if err != nil {
+		return
+	}
+
+	err = utils.Exec("", "netctl", "start", confName)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func connectWireless(netwk *network.WirelessNetwork) (err error) {
 	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
 
@@ -47,6 +71,8 @@ func Connect(netIntf interface{}) (err error) {
 	}
 
 	switch netwk := netIntf.(type) {
+	case *network.WiredNetwork:
+		err = connectWired(netwk)
 	case *network.WirelessNetwork:
 		err = connectWireless(netwk)
 	default:

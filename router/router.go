@@ -13,7 +13,7 @@ import (
 )
 
 type Router struct {
-	Inputs         []string
+	Input          string
 	Outputs        []string
 	Network        *net.IPNet
 	Network6       *net.IPNet
@@ -37,7 +37,7 @@ func (r *Router) Init() {
 	}
 
 	r.routes = &routes.Routes{
-		Input:    r.Inputs[0], // TODO
+		Input:    r.Input,
 		Network:  r.Network,
 		Network6: r.Network6,
 	}
@@ -64,7 +64,7 @@ func (r *Router) Init() {
 	}
 
 	r.iptables = &iptables.IpTables{
-		Input: r.Inputs[0], // TODO
+		Input:    r.Input,
 		Network:  r.Network,
 		Network6: r.Network6,
 	}

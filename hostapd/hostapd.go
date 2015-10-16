@@ -64,7 +64,14 @@ func (h *Hostapd) Start() (err error) {
 		return
 	}
 
-	cmd := exec.Command("hostapd", path)
+	bin := ""
+	if h.Driver == Realtek {
+		bin = "hostapd_rtl"
+	} else {
+		bin = "hostapd"
+	}
+
+	cmd := exec.Command(bin, path)
 	err = h.Run(cmd, func() {
 		os.RemoveAll(filepath.Dir(path))
 	})

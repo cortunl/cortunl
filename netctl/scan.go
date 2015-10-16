@@ -1,4 +1,4 @@
-package wireless
+package netctl
 
 import (
 	"github.com/cortunl/cortunl/network"

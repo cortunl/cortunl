@@ -6,6 +6,7 @@ import (
 
 type WirelessNetwork struct {
 	*Network
+	Mac      string
 	Ssid     string
 	Quality  int
 	Channel  int

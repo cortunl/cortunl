@@ -2,6 +2,7 @@ package wireless
 
 import (
 	"github.com/cortunl/cortunl/network"
+	"github.com/cortunl/cortunl/security"
 	"github.com/cortunl/cortunl/utils"
 	"github.com/dropbox/godropbox/errors"
 	"math"
@@ -130,6 +131,12 @@ func GetNetworks(iface string) (networks []*network.WirelessNetwork,
 			}
 
 			netwk.Ssid = val[1 : len(val)-1]
+		} else if line == "Encryption key:off" {
+			netwk.Security = security.GetSecurity("open")
+		} else if strings.Contains(line, "IE") &&
+			strings.Contains(line, "WPA") {
+
+			netwk.Security = security.GetSecurity("wpa")
 		}
 	}
 

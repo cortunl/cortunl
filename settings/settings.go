@@ -1,11 +1,9 @@
 package settings
 
 var Settings = &SettingsData{
-	LocalDomain:   "network",
-	ExternalWired: []string{},
-	ExternalWireless: []string{
-		"wlan0",
-	},
+	LocalDomain:    "network",
+	InputWired:     "eth0",
+	InputWireless:  "wlan0",
 	WirelessDriver: "auto",
 	DnsServers: []string{
 		"8.8.8.8",
@@ -19,10 +17,10 @@ var Settings = &SettingsData{
 
 type SettingsData struct {
 	LocalDomain      string
-	ExternalWired    []string
-	ExternalWireless []string
-	InternalWired    []string
-	InternalWireless []string
+	InputWired       string
+	InputWireless    string
+	OutputWired      []string
+	OutputWireless   []string
 	WirelessSsid     string
 	WirelessPassword string
 	WirelessDriver   string

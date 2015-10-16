@@ -14,10 +14,15 @@ ssid=%s
 interface=%s
 #bridge=%s
 hw_mode=g
+country_code=US
+wmm_enabled=1
+ieee80211n=1
+ieee80211ac=1
+ieee80211d=1
 channel=%d%s`
 
 const wpaConf = `
-auth_algs=1
+auth_algs=3
 wpa=2
 wpa_passphrase=%s
 wpa_key_mgmt=WPA-PSK

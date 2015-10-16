@@ -10,7 +10,6 @@ type OpenSecurity struct {
 
 func (s *OpenSecurity) Init() {
 	s.props = map[string]string{}
-	s.props["enctype"] = "None"
 }
 
 func (s *OpenSecurity) Type() string {

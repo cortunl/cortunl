@@ -57,17 +57,12 @@ func (h *Hostapd) writeConf() (path string, err error) {
 		wpaData = fmt.Sprintf(wpaConf, h.Password)
 	}
 
-	channel := h.Channel
-	if channel == AutoChan {
-		channel = 6 // TODO
-	}
-
 	data := fmt.Sprintf(conf,
 		driver,
 		h.Ssid,
 		h.Interface,
 		h.Bridge,
-		channel,
+		h.Channel,
 		wpaData,
 	)
 

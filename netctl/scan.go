@@ -3,12 +3,12 @@ package netctl
 import (
 	"github.com/cortunl/cortunl/network"
 	"github.com/cortunl/cortunl/security"
+	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"github.com/dropbox/godropbox/errors"
 	"math"
 	"strconv"
 	"strings"
-	"github.com/cortunl/cortunl/settings"
 )
 
 func parseField(line, field string) (val string, err error) {

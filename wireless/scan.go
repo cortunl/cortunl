@@ -27,6 +27,11 @@ func parseField(line, field string) (val string, err error) {
 func GetNetworks(iface string) (networks []*network.WirelessNetwork,
 	err error) {
 
+	err = utils.Exec("", "ip", "link", "set", iface, "up")
+	if err != nil {
+		return
+	}
+
 	networks = []*network.WirelessNetwork{}
 
 	output, err := utils.ExecOutput("", "iwlist", iface, "scan")

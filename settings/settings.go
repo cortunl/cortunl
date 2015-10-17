@@ -1,5 +1,9 @@
 package settings
 
+import (
+	"time"
+)
+
 var Settings = &SettingsData{
 	LocalDomain:    "network",
 	InputWired:     "eth0",
@@ -13,6 +17,7 @@ var Settings = &SettingsData{
 		"2001:4860:4860::8888",
 		"2001:4860:4860::8844",
 	},
+	BlinkDuration: 5 * time.Second,
 }
 
 type SettingsData struct {
@@ -26,4 +31,5 @@ type SettingsData struct {
 	WirelessDriver   string
 	DnsServers       []string
 	DnsServers6      []string
+	BlinkDuration    time.Duration
 }

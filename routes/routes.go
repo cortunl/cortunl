@@ -9,6 +9,7 @@ import (
 )
 
 type Routes struct {
+	routes   [][]string
 	table    *table
 	Inputs   []*settings.Input
 	Bridge   string
@@ -64,8 +65,8 @@ func (r *Routes) removeTable() (err error) {
 	return
 }
 
-func (r *Routes) getRoutes() (routes [][]string, err error) {
-	routes = [][]string{}
+func (r *Routes) getRoutes() (err error) {
+	r.routes = [][]string{}
 	hasDefault := false
 
 	for _, input := range r.Inputs {
@@ -77,26 +78,26 @@ func (r *Routes) getRoutes() (routes [][]string, err error) {
 
 		if input.AllTraffic && !hasDefault {
 			hasDefault = true
-			routes = append(routes, []string{
+			r.routes = append(r.routes, []string{
 				"table", r.table.Name,
 				"default", "via",
 				inputAddr.Gateway.String(),
 			})
 
-			routes = append(routes, []string{
+			r.routes = append(r.routes, []string{
 				"table", r.table.Name,
 				inputAddr.Network.String(),
 				"dev", input.Interface,
 			})
 
-			routes = append(routes, []string{
+			r.routes = append(r.routes, []string{
 				"table", r.table.Name,
 				inputAddr.Gateway.String(),
 				"dev", input.Interface,
 			})
 		} else {
 			for _, network := range input.Networks {
-				routes = append(routes, []string{
+				r.routes = append(r.routes, []string{
 					"table", r.table.Name,
 					network.String(),
 					"dev", input.Interface,
@@ -106,14 +107,14 @@ func (r *Routes) getRoutes() (routes [][]string, err error) {
 	}
 
 	if !hasDefault {
-		routes = append(routes, []string{
+		r.routes = append(r.routes, []string{
 			"table", r.table.Name,
 			"default", "via",
 			"0.0.0.0",
 		})
 	}
 
-	routes = append(routes, []string{
+	r.routes = append(r.routes, []string{
 		"table", r.table.Name,
 		r.Network.String(),
 		"dev", r.Bridge,
@@ -133,12 +134,12 @@ func (r *Routes) AddRoutes() (err error) {
 		return
 	}
 
-	routes, err := r.getRoutes()
+	err = r.getRoutes()
 	if err != nil {
 		return
 	}
 
-	for _, args := range routes {
+	for _, args := range r.routes {
 		args = append([]string{"route", "add"}, args...)
 		err = utils.Exec("", "ip", args...)
 		if err != nil {
@@ -161,12 +162,7 @@ func (r *Routes) RemoveRoutes() (err error) {
 	}
 	defer r.removeTable()
 
-	routes, err := r.getRoutes()
-	if err != nil {
-		return
-	}
-
-	for _, args := range routes {
+	for _, args := range r.routes {
 		args = append([]string{"route", "del"}, args...)
 		_ = utils.Exec("", "ip", args...)
 	}

@@ -3,7 +3,6 @@ package netctl
 import (
 	"github.com/cortunl/cortunl/network"
 	"github.com/cortunl/cortunl/security"
-	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"github.com/dropbox/godropbox/errors"
 	"math"
@@ -25,8 +24,8 @@ func parseField(line, field string) (val string, err error) {
 	return
 }
 
-func GetNetworks() (networks []*network.WirelessNetwork, err error) {
-	iface := settings.Settings.InputWireless
+func GetNetworks(iface string) (
+	networks []*network.WirelessNetwork, err error) {
 
 	err = utils.Exec("", "ip", "link", "set", iface, "up")
 	if err != nil {

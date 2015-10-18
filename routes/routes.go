@@ -79,26 +79,22 @@ func (r *Routes) getRoutes() (err error) {
 		if input.AllTraffic && !hasDefault {
 			hasDefault = true
 			r.routes = append(r.routes, []string{
-				"table", r.table.Name,
 				"default", "via",
 				inputAddr.Gateway.String(),
 			})
 
 			r.routes = append(r.routes, []string{
-				"table", r.table.Name,
 				inputAddr.Network.String(),
 				"dev", input.Interface,
 			})
 
 			r.routes = append(r.routes, []string{
-				"table", r.table.Name,
 				inputAddr.Gateway.String(),
 				"dev", input.Interface,
 			})
 		} else {
 			for _, network := range input.Networks {
 				r.routes = append(r.routes, []string{
-					"table", r.table.Name,
 					network.String(),
 					"dev", input.Interface,
 				})
@@ -108,14 +104,12 @@ func (r *Routes) getRoutes() (err error) {
 
 	if !hasDefault {
 		r.routes = append(r.routes, []string{
-			"table", r.table.Name,
 			"default", "via",
 			"0.0.0.0",
 		})
 	}
 
 	r.routes = append(r.routes, []string{
-		"table", r.table.Name,
 		r.Network.String(),
 		"dev", r.Bridge,
 	})
@@ -140,7 +134,7 @@ func (r *Routes) AddRoutes() (err error) {
 	}
 
 	for _, args := range r.routes {
-		args = append([]string{"route", "add"}, args...)
+		args = append([]string{"route", "add", "table", r.table.Name}, args...)
 		err = utils.Exec("", "ip", args...)
 		if err != nil {
 			return
@@ -163,7 +157,7 @@ func (r *Routes) RemoveRoutes() (err error) {
 	defer r.removeTable()
 
 	for _, args := range r.routes {
-		args = append([]string{"route", "del"}, args...)
+		args = append([]string{"route", "del", "table", r.table.Name}, args...)
 		_ = utils.Exec("", "ip", args...)
 	}
 

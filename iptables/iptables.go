@@ -11,51 +11,55 @@ type IpTables struct {
 	state    bool
 	rules    [][]string
 	rules6   [][]string
-	Input    *settings.Input
+	Inputs   []*settings.Input
 	Bridge   string
 	Network  *net.IPNet
 	Network6 *net.IPNet
 }
 
+func (t *IpTables) addRule(rule []string, ipv6 bool) {
+	comment := []string{
+		"-m", "comment",
+		"--comment", fmt.Sprintf("cortunl_%s", utils.Uuid()),
+	}
+	rule = append(rule, comment...)
+
+	if ipv6 {
+		t.rules6 = append(t.rules6, rule)
+	} else {
+		t.rules = append(t.rules, rule)
+	}
+}
+
 func (t *IpTables) Init() {
-	for i, network := range []*net.IPNet{t.Network, t.Network6} {
-		rules := [][]string{
-			[]string{
+	t.rules = [][]string{}
+	t.rules6 = [][]string{}
+
+	for _, input := range t.Inputs {
+		for i, network := range []*net.IPNet{t.Network, t.Network6} {
+			ipv6 := i == 1
+
+			t.addRule([]string{
 				"POSTROUTING",
 				"-t", "nat",
-				"-o", t.Input.Interface,
+				"-o", input.Interface,
 				"-j", "MASQUERADE",
 				"-s", network.String(),
-			},
-			[]string{
+			}, ipv6)
+			t.addRule([]string{
 				"FORWARD",
-				"-i", t.Input.Interface,
+				"-i", input.Interface,
 				"-o", t.Bridge,
 				"-m", "state",
 				"--state", "RELATED,ESTABLISHED",
 				"-j", "ACCEPT",
-			},
-			[]string{
+			}, ipv6)
+			t.addRule([]string{
 				"FORWARD",
 				"-i", t.Bridge,
-				"-o", t.Input.Interface,
+				"-o", input.Interface,
 				"-j", "ACCEPT",
-			},
-		}
-
-		for i, rule := range rules {
-			comment := []string{
-				"-m", "comment",
-				"--comment", fmt.Sprintf("cortunl_%s", utils.Uuid()),
-			}
-
-			rules[i] = append(rule, comment...)
-		}
-
-		if i == 0 {
-			t.rules = rules
-		} else {
-			t.rules6 = rules
+			}, ipv6)
 		}
 	}
 

@@ -10,7 +10,7 @@ import (
 
 type Routes struct {
 	table    *table
-	Input    *settings.Input
+	Inputs   []*settings.Input
 	Bridge   string
 	Network  *net.IPNet
 	Network6 *net.IPNet
@@ -66,29 +66,52 @@ func (r *Routes) removeTable() (err error) {
 
 func (r *Routes) getRoutes() (routes [][]string, err error) {
 	routes = [][]string{}
+	hasDefault := false
 
-	inputAddr, err := utils.GetInterfaceAddr(r.Input.Interface)
-	if err != nil {
-		return
+	for _, input := range r.Inputs {
+		inputAddr, e := utils.GetInterfaceAddr(input.Interface)
+		if e != nil {
+			err = e
+			return
+		}
+
+		if input.AllTraffic && !hasDefault {
+			hasDefault = true
+			routes = append(routes, []string{
+				"table", r.table.Name,
+				"default", "via",
+				inputAddr.Gateway.String(),
+			})
+
+			routes = append(routes, []string{
+				"table", r.table.Name,
+				inputAddr.Network.String(),
+				"dev", input.Interface,
+			})
+
+			routes = append(routes, []string{
+				"table", r.table.Name,
+				inputAddr.Gateway.String(),
+				"dev", input.Interface,
+			})
+		} else {
+			for _, network := range input.Networks {
+				routes = append(routes, []string{
+					"table", r.table.Name,
+					network.String(),
+					"dev", input.Interface,
+				})
+			}
+		}
 	}
 
-	routes = append(routes, []string{
-		"table", r.table.Name,
-		"default", "via",
-		inputAddr.Gateway.String(),
-	})
-
-	routes = append(routes, []string{
-		"table", r.table.Name,
-		inputAddr.Network.String(),
-		"dev", r.Input.Interface,
-	})
-
-	routes = append(routes, []string{
-		"table", r.table.Name,
-		inputAddr.Gateway.String(),
-		"dev", r.Input.Interface,
-	})
+	if !hasDefault {
+		routes = append(routes, []string{
+			"table", r.table.Name,
+			"default", "via",
+			"0.0.0.0",
+		})
+	}
 
 	routes = append(routes, []string{
 		"table", r.table.Name,

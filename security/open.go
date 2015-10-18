@@ -27,6 +27,10 @@ func (s *OpenSecurity) Set(key, val string) (err error) {
 	return
 }
 
-func (s *OpenSecurity) Properties() map[string]string {
+func (s *OpenSecurity) Import(props map[string]string) {
+	s.props = props
+}
+
+func (s *OpenSecurity) Export() map[string]string {
 	return s.props
 }

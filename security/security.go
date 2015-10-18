@@ -5,7 +5,8 @@ type Security interface {
 	Type() string
 	Params() []*SecurityParam
 	Set(string, string) error
-	Properties() map[string]string
+	Import(map[string]string)
+	Export() map[string]string
 }
 
 func GetSecurity(typ string) (intf Security) {

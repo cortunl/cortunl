@@ -48,6 +48,10 @@ func (s *WpaSecurity) Set(key, val string) (err error) {
 	return
 }
 
-func (s *WpaSecurity) Properties() map[string]string {
+func (s *WpaSecurity) Import(props map[string]string) {
+	s.props = props
+}
+
+func (s *WpaSecurity) Export() map[string]string {
 	return s.props
 }

@@ -33,7 +33,7 @@ func (r *Router) Init() {
 	}
 
 	r.routes = &routes.Routes{
-		Input:    r.Settings.Inputs[0], // TODO
+		Inputs:   r.Settings.Inputs,
 		Network:  r.Settings.Network,
 		Network6: r.Settings.Network6,
 	}
@@ -63,7 +63,7 @@ func (r *Router) Init() {
 	}
 
 	r.iptables = &iptables.IpTables{
-		Input:    r.Settings.Inputs[0], // TODO
+		Inputs:   r.Settings.Inputs,
 		Network:  r.Settings.Network,
 		Network6: r.Settings.Network6,
 	}

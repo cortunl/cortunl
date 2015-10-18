@@ -123,6 +123,12 @@ func (r *Routes) AddRoutes() (err error) {
 		}
 	}
 
+	err = utils.Exec("", "ip", "rule", "add",
+		"from", r.Network.String(), "lookup", r.table.Name)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
@@ -140,6 +146,12 @@ func (r *Routes) RemoveRoutes() (err error) {
 	for _, args := range routes {
 		args = append([]string{"route", "del"}, args...)
 		_ = utils.Exec("", "ip", args...)
+	}
+
+	utils.Exec("", "ip", "rule", "del",
+		"from", r.Network.String(), "lookup", r.table.Name)
+	if err != nil {
+		return
 	}
 
 	return

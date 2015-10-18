@@ -2,6 +2,7 @@ package routes
 
 import (
 	"fmt"
+	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
 	"strings"
@@ -9,8 +10,8 @@ import (
 
 type Routes struct {
 	table    *table
-	Input    string
-	Output   string
+	Input    *settings.Input
+	Bridge   string
 	Network  *net.IPNet
 	Network6 *net.IPNet
 }
@@ -66,7 +67,7 @@ func (r *Routes) removeTable() (err error) {
 func (r *Routes) getRoutes() (routes [][]string, err error) {
 	routes = [][]string{}
 
-	inputAddr, err := utils.GetInterfaceAddr(r.Input)
+	inputAddr, err := utils.GetInterfaceAddr(r.Input.Interface)
 	if err != nil {
 		return
 	}
@@ -80,19 +81,19 @@ func (r *Routes) getRoutes() (routes [][]string, err error) {
 	routes = append(routes, []string{
 		"table", r.table.Name,
 		inputAddr.Network.String(),
-		"dev", r.Input,
+		"dev", r.Input.Interface,
 	})
 
 	routes = append(routes, []string{
 		"table", r.table.Name,
 		inputAddr.Gateway.String(),
-		"dev", r.Input,
+		"dev", r.Input.Interface,
 	})
 
 	routes = append(routes, []string{
 		"table", r.table.Name,
 		r.Network.String(),
-		"dev", r.Output,
+		"dev", r.Bridge,
 	})
 
 	return

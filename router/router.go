@@ -6,6 +6,7 @@ import (
 	"github.com/cortunl/cortunl/hostapd"
 	"github.com/cortunl/cortunl/iptables"
 	"github.com/cortunl/cortunl/routes"
+	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
 	"strings"
@@ -13,12 +14,7 @@ import (
 )
 
 type Router struct {
-	Input          string
-	Outputs        []string
-	Network        *net.IPNet
-	Network6       *net.IPNet
-	Ssid           string
-	Password       string
+	Settings       *settings.Router
 	bridge         string
 	bridgeServer   *bridge.Bridge
 	routes         *routes.Routes
@@ -31,42 +27,45 @@ func (r *Router) Init() {
 	r.hostapdServers = []*hostapd.Hostapd{}
 
 	r.bridgeServer = &bridge.Bridge{
-		Network:    r.Network,
-		Network6:   r.Network6,
-		Interfaces: r.Outputs,
+		Network:  r.Settings.Network,
+		Network6: r.Settings.Network6,
+		Outputs:  r.Settings.Outputs,
 	}
 
 	r.routes = &routes.Routes{
-		Input:    r.Input,
-		Network:  r.Network,
-		Network6: r.Network6,
+		Input:    r.Settings.Inputs[0], // TODO
+		Network:  r.Settings.Network,
+		Network6: r.Settings.Network6,
 	}
 
-	for _, output := range r.Outputs {
-		if !strings.HasPrefix(output, "w") {
+	for _, output := range r.Settings.Outputs {
+		if !strings.HasPrefix(output.Interface, "w") {
 			continue
 		}
 
 		server := &hostapd.Hostapd{
 			Driver:    hostapd.AutoDrv,
-			Interface: output,
-			Ssid:      r.Ssid,
-			Channel:   hostapd.AutoChan,
-			Password:  r.Password,
+			Interface: output.Interface,
+			Ssid:      r.Settings.WirelessSsid,
+			Password:  r.Settings.WirelessPassword,
+			Channel:   r.Settings.WirelessChannel,
 		}
 
 		r.hostapdServers = append(r.hostapdServers, server)
 	}
 
 	r.dhcpServer = &dhcp.Dhcp{
-		Network:  r.Network,
-		Network6: r.Network6,
+		LocalDomain: r.Settings.LocalDomain,
+		DnsServers:  r.Settings.DnsServers,
+		DnsServers6: r.Settings.DnsServers6,
+		Network:     r.Settings.Network,
+		Network6:    r.Settings.Network6,
 	}
 
 	r.iptables = &iptables.IpTables{
-		Input:    r.Input,
-		Network:  r.Network,
-		Network6: r.Network6,
+		Input:    r.Settings.Inputs[0], // TODO
+		Network:  r.Settings.Network,
+		Network6: r.Settings.Network6,
 	}
 }
 
@@ -82,7 +81,7 @@ func (r *Router) Start() (err error) {
 	}
 	r.bridge = r.bridgeServer.Bridge
 
-	r.routes.Output = r.bridge
+	r.routes.Bridge = r.bridge
 	err = r.routes.AddRoutes()
 	if err != nil {
 		return
@@ -98,13 +97,13 @@ func (r *Router) Start() (err error) {
 
 	time.Sleep(1 * time.Second)
 
-	r.dhcpServer.Interface = r.bridge
+	r.dhcpServer.Bridge = r.bridge
 	err = r.dhcpServer.Start()
 	if err != nil {
 		return
 	}
 
-	r.iptables.Output = r.bridge
+	r.iptables.Bridge = r.bridge
 	r.iptables.Init()
 	err = r.iptables.AddRules()
 	if err != nil {

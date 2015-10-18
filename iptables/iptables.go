@@ -2,6 +2,7 @@ package iptables
 
 import (
 	"fmt"
+	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
 )
@@ -10,8 +11,8 @@ type IpTables struct {
 	state    bool
 	rules    [][]string
 	rules6   [][]string
-	Input    string
-	Output   string
+	Input    *settings.Input
+	Bridge   string
 	Network  *net.IPNet
 	Network6 *net.IPNet
 }
@@ -22,22 +23,22 @@ func (t *IpTables) Init() {
 			[]string{
 				"POSTROUTING",
 				"-t", "nat",
-				"-o", t.Input,
+				"-o", t.Input.Interface,
 				"-j", "MASQUERADE",
 				"-s", network.String(),
 			},
 			[]string{
 				"FORWARD",
-				"-i", t.Input,
-				"-o", t.Output,
+				"-i", t.Input.Interface,
+				"-o", t.Bridge,
 				"-m", "state",
 				"--state", "RELATED,ESTABLISHED",
 				"-j", "ACCEPT",
 			},
 			[]string{
 				"FORWARD",
-				"-i", t.Output,
-				"-o", t.Input,
+				"-i", t.Bridge,
+				"-o", t.Input.Interface,
 				"-j", "ACCEPT",
 			},
 		}

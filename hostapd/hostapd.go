@@ -59,7 +59,7 @@ func (h *Hostapd) writeConf() (path string, err error) {
 
 	channel := h.Channel
 	if channel == AutoChan {
-		channel = 6 // TODO
+		channel = 1 // TODO
 	}
 
 	data := fmt.Sprintf(conf,

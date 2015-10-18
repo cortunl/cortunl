@@ -19,11 +19,11 @@ country_code=US
 ieee80211d=1
 wmm_enabled=1
 ieee80211n=1
-ieee80211ac=1
+#ieee80211ac=1
 channel=%d%s`
 
 const wpaConf = `
-auth_algs=1
+auth_algs=3
 wpa=3
 wpa_passphrase=%s
 wpa_key_mgmt=WPA-PSK

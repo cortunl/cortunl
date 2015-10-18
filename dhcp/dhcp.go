@@ -3,7 +3,6 @@ package dhcp
 import (
 	"fmt"
 	"github.com/cortunl/cortunl/runner"
-	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
 	"os"
@@ -14,9 +13,12 @@ import (
 
 type Dhcp struct {
 	runner.Runner
-	Interface string
-	Network   *net.IPNet
-	Network6  *net.IPNet
+	Bridge      string
+	LocalDomain string
+	DnsServers  []string
+	DnsServers6 []string
+	Network     *net.IPNet
+	Network6    *net.IPNet
 }
 
 func (d *Dhcp) writeConf() (path string, err error) {
@@ -48,17 +50,17 @@ func (d *Dhcp) writeConf() (path string, err error) {
 
 	servers := ""
 	dnsServers := []string{}
-	dnsServers = append(dnsServers, settings.Settings.DnsServers...)
-	dnsServers = append(dnsServers, settings.Settings.DnsServers6...)
+	dnsServers = append(dnsServers, d.DnsServers...)
+	dnsServers = append(dnsServers, d.DnsServers6...)
 	for _, svr := range dnsServers {
 		servers += fmt.Sprintf("server=%s\n", svr)
 	}
 
 	data := fmt.Sprintf(conf,
 		servers,
-		d.Interface,
-		settings.Settings.LocalDomain,
-		settings.Settings.LocalDomain,
+		d.Bridge,
+		d.LocalDomain,
+		d.LocalDomain,
 		start,
 		end,
 		mask,
@@ -66,10 +68,10 @@ func (d *Dhcp) writeConf() (path string, err error) {
 		cidr6,
 		router,
 		router,
-		settings.Settings.DnsServers[0],
+		d.DnsServers[0], // TODO
 		router6,
-		settings.Settings.DnsServers6[0],
-		settings.Settings.LocalDomain,
+		d.DnsServers6[0], // TODO
+		d.LocalDomain,
 	)
 
 	err = utils.Write(path, data)

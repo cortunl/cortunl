@@ -47,7 +47,7 @@ func connectWireless(netwk *network.WirelessNetwork) (err error) {
 	)
 	data += fmt.Sprintf("ESSID='%s'\n", netwk.Ssid)
 
-	for key, val := range netwk.Security.Properties() {
+	for key, val := range netwk.Security.Export() {
 		data += fmt.Sprintf("%s='%s'\n", key, val)
 	}
 

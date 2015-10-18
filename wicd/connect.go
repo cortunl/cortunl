@@ -29,7 +29,7 @@ func connectWireless(net *network.WirelessNetwork) (err error) {
 		return
 	}
 
-	for key, val := range net.Security.Properties() {
+	for key, val := range net.Security.Export() {
 		err = utils.Exec("", "wicd-cli", "--wireless",
 			"--network", num, "--network-property", key,
 			"--set-to", val)

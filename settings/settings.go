@@ -1,35 +1,53 @@
 package settings
 
 import (
+	"github.com/cortunl/cortunl/hostapd"
+	"net"
 	"time"
 )
 
 var Settings = &SettingsData{
-	LocalDomain:    "network",
-	InputWired:     "eth0",
-	InputWireless:  "wlan0",
 	WirelessDriver: "auto",
-	DnsServers: []string{
-		"8.8.8.8",
-		"8.8.4.4",
-	},
-	DnsServers6: []string{
-		"2001:4860:4860::8888",
-		"2001:4860:4860::8844",
-	},
-	BlinkDuration: 5 * time.Second,
+	BlinkDuration:  5 * time.Second,
+}
+
+func init() {
+	_, network, _ := net.ParseCIDR("192.168.32.0/24")
+	_, network6, _ := net.ParseCIDR("fd32:3032::/64")
+
+	Settings.Routers = []*Router{
+		&Router{
+			LocalDomain: "network",
+			Inputs: []*Input{
+				&Input{
+					Interface:  "eth0",
+					AllTraffic: true,
+				},
+			},
+			Outputs: []*Output{
+				&Output{
+					Interface: "wlan0",
+				},
+			},
+			Network:          network,
+			Network6:         network6,
+			WirelessSsid:     "archtest",
+			WirelessPassword: "archtest1234",
+			WirelessChannel:  hostapd.AutoChan,
+			DnsServers: []string{
+				"8.8.8.8",
+				"8.8.4.4",
+			},
+			DnsServers6: []string{
+				"2001:4860:4860::8888",
+				"2001:4860:4860::8844",
+			},
+		},
+	}
 }
 
 type SettingsData struct {
-	LocalDomain      string
-	InputWired       string
-	InputWireless    string
-	OutputWired      []string
-	OutputWireless   []string
-	WirelessSsid     string
-	WirelessPassword string
-	WirelessDriver   string
-	DnsServers       []string
-	DnsServers6      []string
-	BlinkDuration    time.Duration
+	Routers        []*Router
+	WirelessDriver string
+	BlinkDuration  time.Duration
 }

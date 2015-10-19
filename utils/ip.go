@@ -19,6 +19,10 @@ type InterfaceAddr struct {
 	Network6 *net.IPNet
 }
 
+var (
+	nilAddr  = []byte{0, 0, 0, 0}
+	nilAddr6 = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+)
 var offsets = [...]int{
 	0,
 	0,
@@ -128,11 +132,18 @@ func IterNetwork(network *net.IPNet) <-chan net.IP {
 	return iter
 }
 
+func IsNilAddr(addr net.IP) bool {
+	return bytes.HasSuffix(addr, nilAddr)
+}
+
+func IsNilAddr6(addr net.IP) bool {
+	return bytes.Equal(addr, nilAddr6)
+}
+
 func GetGateways() (gateways map[string]net.IP, err error) {
 	gateways = map[string]net.IP{}
 	gatewaysList := map[string]*list.List{}
 	gatewaySets := map[string]set.Set{}
-	nilAddr := []byte{0, 0, 0, 0}
 
 	output, err := ExecOutput("", "route", "-n")
 	if err != nil {

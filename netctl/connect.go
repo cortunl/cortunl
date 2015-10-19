@@ -7,6 +7,11 @@ import (
 )
 
 func connectWired(netwk *network.WiredNetwork) (err error) {
+	err = Disconnect(netwk.Interface)
+	if err != nil {
+		return
+	}
+
 	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
 
 	data := fmt.Sprintf(conf,
@@ -14,12 +19,12 @@ func connectWired(netwk *network.WiredNetwork) (err error) {
 		netwk.Interface,
 	)
 
-	err = utils.Write(confPath, data)
+	err = utils.Write(confPathPrefix + netwk.Interface, data)
 	if err != nil {
 		return
 	}
 
-	err = utils.Exec("", "netctl", "start", confName)
+	err = utils.Exec("", "netctl", "start", confNamePrefix + netwk.Interface)
 	if err != nil {
 		return
 	}
@@ -28,6 +33,11 @@ func connectWired(netwk *network.WiredNetwork) (err error) {
 }
 
 func connectWireless(netwk *network.WirelessNetwork) (err error) {
+	err = Disconnect(netwk.Interface)
+	if err != nil {
+		return
+	}
+
 	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
 
 	data := fmt.Sprintf(conf,
@@ -40,12 +50,12 @@ func connectWireless(netwk *network.WirelessNetwork) (err error) {
 		data += fmt.Sprintf("%s='%s'\n", key, val)
 	}
 
-	err = utils.Write(confPath, data)
+	err = utils.Write(confPathPrefix + netwk.Interface, data)
 	if err != nil {
 		return
 	}
 
-	err = utils.Exec("", "netctl", "start", confName)
+	err = utils.Exec("", "netctl", "start", confNamePrefix + netwk.Interface)
 	if err != nil {
 		return
 	}
@@ -54,11 +64,6 @@ func connectWireless(netwk *network.WirelessNetwork) (err error) {
 }
 
 func Connect(netIntf interface{}) (err error) {
-	err = Disconnect()
-	if err != nil {
-		return
-	}
-
 	switch netwk := netIntf.(type) {
 	case *network.WiredNetwork:
 		err = connectWired(netwk)

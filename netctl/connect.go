@@ -4,18 +4,10 @@ import (
 	"fmt"
 	"github.com/cortunl/cortunl/network"
 	"github.com/cortunl/cortunl/utils"
-	"sync"
-)
-
-var (
-	lock = sync.Mutex{}
 )
 
 func connectWired(netwk *network.WiredNetwork) (err error) {
 	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
-
-	lock.Lock()
-	defer lock.Unlock()
 
 	data := fmt.Sprintf(conf,
 		"wired",
@@ -37,9 +29,6 @@ func connectWired(netwk *network.WiredNetwork) (err error) {
 
 func connectWireless(netwk *network.WirelessNetwork) (err error) {
 	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
-
-	lock.Lock()
-	defer lock.Unlock()
 
 	data := fmt.Sprintf(conf,
 		"wireless",

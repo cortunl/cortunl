@@ -10,6 +10,7 @@ import (
 
 type Routes struct {
 	routes   [][]string
+	rules    [][]string
 	table    *table
 	Inputs   []*settings.Input
 	Bridge   string
@@ -117,6 +118,23 @@ func (r *Routes) getRoutes() (err error) {
 	return
 }
 
+func (r *Routes) getRules() (err error) {
+	r.rules = [][]string{}
+
+	r.rules = append(r.rules, []string{
+		"from", r.Network.String(),
+		"lookup", r.table.Name,
+		"prio", "1",
+	})
+
+	r.rules = append(r.rules, []string{
+		"unreachable", "from", r.Network.String(),
+		"prio", "2",
+	})
+
+	return
+}
+
 func (r *Routes) AddRoutes() (err error) {
 	if r.table != nil {
 		panic("routes: Routes already added")
@@ -133,6 +151,11 @@ func (r *Routes) AddRoutes() (err error) {
 		return
 	}
 
+	err = r.getRules()
+	if err != nil {
+		return
+	}
+
 	for _, args := range r.routes {
 		args = append([]string{"route", "add", "table", r.table.Name}, args...)
 		err = utils.Exec("", "ip", args...)
@@ -141,10 +164,12 @@ func (r *Routes) AddRoutes() (err error) {
 		}
 	}
 
-	err = utils.Exec("", "ip", "rule", "add",
-		"from", r.Network.String(), "lookup", r.table.Name)
-	if err != nil {
-		return
+	for _, args := range r.rules {
+		args = append([]string{"rule", "add"}, args...)
+		err = utils.Exec("", "ip", args...)
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -161,10 +186,9 @@ func (r *Routes) RemoveRoutes() (err error) {
 		_ = utils.Exec("", "ip", args...)
 	}
 
-	utils.Exec("", "ip", "rule", "del",
-		"from", r.Network.String(), "lookup", r.table.Name)
-	if err != nil {
-		return
+	for _, args := range r.rules {
+		args = append([]string{"rule", "del"}, args...)
+		_ = utils.Exec("", "ip", args...)
 	}
 
 	return

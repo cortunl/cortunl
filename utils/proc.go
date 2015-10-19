@@ -7,8 +7,8 @@ import (
 	"os/exec"
 )
 
-func Exec(dir, name string, arg ...string) (err error) {
-	cmd := exec.Command(name, arg...)
+func Exec(dir, name string, args ...string) (err error) {
+	cmd := exec.Command(name, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -19,7 +19,7 @@ func Exec(dir, name string, arg ...string) (err error) {
 	err = cmd.Run()
 	if err != nil {
 		err = &constants.ExecError{
-			errors.Wrapf(err, "utils: Failed to exec '%s'", name),
+			errors.Wrapf(err, "utils: Failed to exec %s %s", name, args),
 		}
 		return
 	}
@@ -27,8 +27,8 @@ func Exec(dir, name string, arg ...string) (err error) {
 	return
 }
 
-func ExecSilent(dir, name string, arg ...string) (err error) {
-	cmd := exec.Command(name, arg...)
+func ExecSilent(dir, name string, args ...string) (err error) {
+	cmd := exec.Command(name, args...)
 	if dir != "" {
 		cmd.Dir = dir
 	}
@@ -36,7 +36,7 @@ func ExecSilent(dir, name string, arg ...string) (err error) {
 	_, err = cmd.CombinedOutput()
 	if err != nil {
 		err = &constants.ExecError{
-			errors.Wrapf(err, "utils: Failed to exec '%s'", name),
+			errors.Wrapf(err, "utils: Failed to exec %s %s", name, args),
 		}
 		return
 	}
@@ -44,8 +44,8 @@ func ExecSilent(dir, name string, arg ...string) (err error) {
 	return
 }
 
-func ExecOutput(dir, name string, arg ...string) (output string, err error) {
-	cmd := exec.Command(name, arg...)
+func ExecOutput(dir, name string, args ...string) (output string, err error) {
+	cmd := exec.Command(name, args...)
 	if dir != "" {
 		cmd.Dir = dir
 	}
@@ -53,7 +53,7 @@ func ExecOutput(dir, name string, arg ...string) (output string, err error) {
 	outputByt, err := cmd.CombinedOutput()
 	if err != nil {
 		err = &constants.ExecError{
-			errors.Wrapf(err, "utils: Failed to exec '%s'", name),
+			errors.Wrapf(err, "utils: Failed to exec %s %s", name, args),
 		}
 		return
 	}

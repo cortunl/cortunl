@@ -14,7 +14,6 @@ import (
 
 type Router struct {
 	Settings *settings.Router
-	bridge   string
 	brdg     *bridge.Bridge
 	routes   *routes.Routes
 	dcp      *dhcp.Dhcp
@@ -30,9 +29,11 @@ func (r *Router) Init() {
 		Network6: r.Settings.Network6,
 		Outputs:  r.Settings.Outputs,
 	}
+	r.brdg.Init()
 
 	r.routes = &routes.Routes{
 		Inputs:   r.Settings.Inputs,
+		Bridge:   r.brdg.Bridge,
 		Network:  r.Settings.Network,
 		Network6: r.Settings.Network6,
 	}
@@ -45,6 +46,7 @@ func (r *Router) Init() {
 		server := &hostapd.Hostapd{
 			Driver:    hostapd.AutoDrv,
 			Interface: output.Interface,
+			Bridge:    r.brdg.Bridge,
 			Ssid:      r.Settings.WirelessSsid,
 			Password:  r.Settings.WirelessPassword,
 			Channel:   r.Settings.WirelessChannel,
@@ -54,6 +56,7 @@ func (r *Router) Init() {
 	}
 
 	r.dcp = &dhcp.Dhcp{
+		Bridge:      r.brdg.Bridge,
 		LocalDomain: r.Settings.LocalDomain,
 		DnsServers:  r.Settings.DnsServers,
 		DnsServers6: r.Settings.DnsServers6,
@@ -63,6 +66,7 @@ func (r *Router) Init() {
 
 	r.iptables = &iptables.IpTables{
 		Inputs:   r.Settings.Inputs,
+		Bridge:   r.brdg.Bridge,
 		Network:  r.Settings.Network,
 		Network6: r.Settings.Network6,
 	}
@@ -78,16 +82,13 @@ func (r *Router) Start() (err error) {
 	if err != nil {
 		return
 	}
-	r.bridge = r.brdg.Bridge
 
-	r.routes.Bridge = r.bridge
 	err = r.routes.AddRoutes()
 	if err != nil {
 		return
 	}
 
 	for _, hostapdServer := range r.hstpd {
-		hostapdServer.Bridge = r.bridge
 		err = hostapdServer.Start()
 		if err != nil {
 			return
@@ -96,13 +97,11 @@ func (r *Router) Start() (err error) {
 
 	time.Sleep(1 * time.Second)
 
-	r.dcp.Bridge = r.bridge
 	err = r.dcp.Start()
 	if err != nil {
 		return
 	}
 
-	r.iptables.Bridge = r.bridge
 	r.iptables.Init()
 	err = r.iptables.AddRules()
 	if err != nil {
@@ -117,6 +116,7 @@ func (r *Router) Stop() (err error) {
 	if err != nil {
 		return
 	}
+	r.brdg.Deinit()
 
 	err = r.routes.RemoveRoutes()
 	if err != nil {

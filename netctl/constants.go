@@ -1,8 +1,8 @@
 package netctl
 
 const (
-	confName = "cortunl"
-	confPath = "/etc/netctl/" + confName
+	confNamePrefix = "cortunl_"
+	confPathPrefix = "/etc/netctl/" + confNamePrefix
 )
 
 const conf = `Description='Cortunl Connection'

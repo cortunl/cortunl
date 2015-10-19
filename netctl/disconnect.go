@@ -4,8 +4,8 @@ import (
 	"github.com/cortunl/cortunl/utils"
 )
 
-func Disconnect() (err error) {
-	err = utils.Exec("", "netctl", "stop-all")
+func Disconnect(iface string) (err error) {
+	err = utils.Exec("", "netctl", confNamePrefix+iface)
 	if err != nil {
 		return
 	}

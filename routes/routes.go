@@ -10,7 +10,9 @@ import (
 
 type Routes struct {
 	routes   [][]string
+	routes6  [][]string
 	rules    [][]string
+	rules6   [][]string
 	table    *table
 	Inputs   []*settings.Input
 	Bridge   string
@@ -79,24 +81,35 @@ func (r *Routes) getRoutes() (err error) {
 
 		if input.AllTraffic && !hasDefault {
 			hasDefault = true
+
 			r.routes = append(r.routes, []string{
 				"default", "via",
 				inputAddr.Gateway.String(),
 			})
 
-			r.routes = append(r.routes, []string{
-				inputAddr.Network.String(),
-				"dev", input.Interface,
-			})
+			if inputAddr.Gateway6 != nil {
+				r.routes6 = append(r.routes6, []string{
+					"default", "via",
+					inputAddr.Gateway6.String(),
+					"dev", input.Interface,
+				})
+			}
 
 			r.routes = append(r.routes, []string{
-				inputAddr.Gateway.String(),
+				inputAddr.Network.String(),
 				"dev", input.Interface,
 			})
 		} else {
 			for _, network := range input.Networks {
 				r.routes = append(r.routes, []string{
 					network.String(),
+					"dev", input.Interface,
+				})
+			}
+
+			for _, network6 := range input.Networks6 {
+				r.routes6 = append(r.routes6, []string{
+					network6.String(),
 					"dev", input.Interface,
 				})
 			}
@@ -120,15 +133,25 @@ func (r *Routes) getRoutes() (err error) {
 
 func (r *Routes) getRules() (err error) {
 	r.rules = [][]string{}
+	r.rules6 = [][]string{}
 
 	r.rules = append(r.rules, []string{
 		"from", r.Network.String(),
 		"lookup", r.table.Name,
 		"prio", "1",
 	})
+	r.rules6 = append(r.rules6, []string{
+		"from", r.Network6.String(),
+		"lookup", r.table.Name,
+		"prio", "1",
+	})
 
 	r.rules = append(r.rules, []string{
 		"unreachable", "from", r.Network.String(),
+		"prio", "2",
+	})
+	r.rules6 = append(r.rules6, []string{
+		"unreachable", "from", r.Network6.String(),
 		"prio", "2",
 	})
 
@@ -164,8 +187,25 @@ func (r *Routes) AddRoutes() (err error) {
 		}
 	}
 
+	for _, args := range r.routes6 {
+		args = append([]string{"-6", "route", "add",
+			"table", r.table.Name}, args...)
+		err = utils.Exec("", "ip", args...)
+		if err != nil {
+			return
+		}
+	}
+
 	for _, args := range r.rules {
 		args = append([]string{"rule", "add"}, args...)
+		err = utils.Exec("", "ip", args...)
+		if err != nil {
+			return
+		}
+	}
+
+	for _, args := range r.rules6 {
+		args = append([]string{"-6", "rule", "add"}, args...)
 		err = utils.Exec("", "ip", args...)
 		if err != nil {
 			return

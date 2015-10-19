@@ -192,6 +192,58 @@ func GetGateways() (gateways map[string]net.IP, err error) {
 	return
 }
 
+func GetGateways6() (gateways map[string]net.IP, err error) {
+	gateways = map[string]net.IP{}
+	gatewaysList := map[string]*list.List{}
+	gatewaySets := map[string]set.Set{}
+
+	output, err := ExecOutput("", "route", "-n", "-6")
+	if err != nil {
+		return
+	}
+
+	for _, line := range strings.Split(output, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) != 7 {
+			continue
+		}
+
+		addr := net.ParseIP(fields[1])
+		if addr == nil || IsNilAddr6(addr) {
+			continue
+		}
+		iface := fields[6]
+
+		var gwList *list.List
+		gwSet, ok := gatewaySets[iface]
+		if !ok {
+			gwSet = set.NewSet()
+			gatewaySets[iface] = gwSet
+
+			gwList = list.New()
+			gatewaysList[iface] = gwList
+		} else {
+			if gwSet.Contains(addr) {
+				continue
+			}
+
+			gwList = gatewaysList[iface]
+		}
+
+		if addr[len(addr)-1] == 1 {
+			gwList.PushFront(addr)
+		} else {
+			gwList.PushBack(addr)
+		}
+	}
+
+	for iface, gwList := range gatewaysList {
+		gateways[iface] = gwList.Front().Value.(net.IP)
+	}
+
+	return
+}
+
 func GetInterfaceAddr(iface string) (ifaceAddr *InterfaceAddr, err error) {
 	gateways, err := GetGateways()
 	if err != nil {

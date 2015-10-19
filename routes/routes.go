@@ -144,6 +144,12 @@ func (r *Routes) getRoutes() (err error) {
 		"dev", r.Bridge,
 	})
 
+	r.routes6 = append(r.routes6, []string{
+		r.Network6.String(),
+		"dev", r.Bridge,
+		"mtu", strconv.Itoa(gatewayMtu),
+	})
+
 	return
 }
 

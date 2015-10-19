@@ -121,6 +121,16 @@ func (t *IpTables) AddRules() (err error) {
 	}
 	t.state = true
 
+	err = utils.Exec("", "iptables", "-P", "FORWARD", "DROP")
+	if err != nil {
+		return
+	}
+
+	err = utils.Exec("", "ip6tables", "-P", "FORWARD", "DROP")
+	if err != nil {
+		return
+	}
+
 	err = t.run("-I", false)
 	if err != nil {
 		return

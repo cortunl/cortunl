@@ -3,10 +3,12 @@ package utils
 import (
 	"bytes"
 	"container/list"
+	"fmt"
 	"github.com/cortunl/cortunl/constants"
 	"github.com/dropbox/godropbox/container/set"
 	"github.com/dropbox/godropbox/errors"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -239,6 +241,34 @@ func GetGateways6() (gateways map[string]net.IP, err error) {
 
 	for iface, gwList := range gatewaysList {
 		gateways[iface] = gwList.Front().Value.(net.IP)
+	}
+
+	return
+}
+
+func GetInterfaceMtu6(iface string) (mtu int, err error) {
+	data, err := Read(fmt.Sprintf("/proc/sys/net/ipv6/conf/%s/mtu", iface))
+	if err != nil {
+		return
+	}
+
+	mtu, err = strconv.Atoi(strings.TrimSpace(data))
+	if err != nil {
+		err = &constants.UnknownError{
+			errors.Wrapf(err, "utils: Failed to get interface '%s' mtu",
+				iface),
+		}
+		return
+	}
+
+	return
+}
+
+func SetInterfaceMtu6(iface string, mtu int) (err error) {
+	err = Write(fmt.Sprintf("/proc/sys/net/ipv6/conf/%s/mtu", iface),
+		strconv.Itoa(mtu))
+	if err != nil {
+		return
 	}
 
 	return

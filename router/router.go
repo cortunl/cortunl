@@ -8,25 +8,24 @@ import (
 	"github.com/cortunl/cortunl/routes"
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
-	"net"
 	"strings"
 	"time"
 )
 
 type Router struct {
-	Settings       *settings.Router
-	bridge         string
-	bridgeServer   *bridge.Bridge
-	routes         *routes.Routes
-	dhcpServer     *dhcp.Dhcp
-	hostapdServers []*hostapd.Hostapd
-	iptables       *iptables.IpTables
+	Settings *settings.Router
+	bridge   string
+	brdg     *bridge.Bridge
+	routes   *routes.Routes
+	dcp      *dhcp.Dhcp
+	hstpd    []*hostapd.Hostapd
+	iptables *iptables.IpTables
 }
 
 func (r *Router) Init() {
-	r.hostapdServers = []*hostapd.Hostapd{}
+	r.hstpd = []*hostapd.Hostapd{}
 
-	r.bridgeServer = &bridge.Bridge{
+	r.brdg = &bridge.Bridge{
 		Network:  r.Settings.Network,
 		Network6: r.Settings.Network6,
 		Outputs:  r.Settings.Outputs,
@@ -51,10 +50,10 @@ func (r *Router) Init() {
 			Channel:   r.Settings.WirelessChannel,
 		}
 
-		r.hostapdServers = append(r.hostapdServers, server)
+		r.hstpd = append(r.hstpd, server)
 	}
 
-	r.dhcpServer = &dhcp.Dhcp{
+	r.dcp = &dhcp.Dhcp{
 		LocalDomain: r.Settings.LocalDomain,
 		DnsServers:  r.Settings.DnsServers,
 		DnsServers6: r.Settings.DnsServers6,
@@ -75,11 +74,11 @@ func (r *Router) Start() (err error) {
 		return
 	}
 
-	err = r.bridgeServer.Start()
+	err = r.brdg.Start()
 	if err != nil {
 		return
 	}
-	r.bridge = r.bridgeServer.Bridge
+	r.bridge = r.brdg.Bridge
 
 	r.routes.Bridge = r.bridge
 	err = r.routes.AddRoutes()
@@ -87,7 +86,7 @@ func (r *Router) Start() (err error) {
 		return
 	}
 
-	for _, hostapdServer := range r.hostapdServers {
+	for _, hostapdServer := range r.hstpd {
 		hostapdServer.Bridge = r.bridge
 		err = hostapdServer.Start()
 		if err != nil {
@@ -97,8 +96,8 @@ func (r *Router) Start() (err error) {
 
 	time.Sleep(1 * time.Second)
 
-	r.dhcpServer.Bridge = r.bridge
-	err = r.dhcpServer.Start()
+	r.dcp.Bridge = r.bridge
+	err = r.dcp.Start()
 	if err != nil {
 		return
 	}
@@ -114,7 +113,7 @@ func (r *Router) Start() (err error) {
 }
 
 func (r *Router) Stop() (err error) {
-	err = r.bridgeServer.Stop()
+	err = r.brdg.Stop()
 	if err != nil {
 		return
 	}
@@ -124,7 +123,7 @@ func (r *Router) Stop() (err error) {
 		return
 	}
 
-	for _, hostapdServer := range r.hostapdServers {
+	for _, hostapdServer := range r.hstpd {
 		err = hostapdServer.Stop()
 		if err != nil {
 			return
@@ -133,11 +132,11 @@ func (r *Router) Stop() (err error) {
 		hostapdServer.Wait()
 	}
 
-	err = r.dhcpServer.Stop()
+	err = r.dcp.Stop()
 	if err != nil {
 		return
 	}
-	r.dhcpServer.Wait()
+	r.dcp.Wait()
 
 	err = r.iptables.RemoveRules()
 	if err != nil {

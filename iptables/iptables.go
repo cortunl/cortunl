@@ -55,12 +55,33 @@ func (t *IpTables) Init() {
 				"--state", "RELATED,ESTABLISHED",
 				"-j", "ACCEPT",
 			}, ipv6)
-			t.addRule([]string{
-				"FORWARD",
-				"-i", t.Bridge,
-				"-o", input.Interface,
-				"-j", "ACCEPT",
-			}, ipv6)
+
+			if input.AllTraffic {
+				t.addRule([]string{
+					"FORWARD",
+					"-i", t.Bridge,
+					"-o", input.Interface,
+					"-j", "ACCEPT",
+				}, ipv6)
+			} else {
+				var networks []*net.IPNet
+
+				if ipv6 {
+					networks = input.Networks6
+				} else {
+					networks = input.Networks
+				}
+
+				for _, network := range networks {
+					t.addRule([]string{
+						"FORWARD",
+						"-i", t.Bridge,
+						"-o", input.Interface,
+						"-d", network.String(),
+						"-j", "ACCEPT",
+					}, ipv6)
+				}
+			}
 		}
 	}
 

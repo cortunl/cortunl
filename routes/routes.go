@@ -248,8 +248,19 @@ func (r *Routes) RemoveRoutes() (err error) {
 		_ = utils.Exec("", "ip", args...)
 	}
 
+	for _, args := range r.routes6 {
+		args = append([]string{"-6", "route", "del",
+			"table", r.table.Name}, args...)
+		_ = utils.Exec("", "ip", args...)
+	}
+
 	for _, args := range r.rules {
 		args = append([]string{"rule", "del"}, args...)
+		_ = utils.Exec("", "ip", args...)
+	}
+
+	for _, args := range r.rules {
+		args = append([]string{"-6", "rule", "del"}, args...)
 		_ = utils.Exec("", "ip", args...)
 	}
 

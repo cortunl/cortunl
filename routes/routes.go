@@ -128,16 +128,15 @@ func (r *Routes) getRoutes() (err error) {
 				r.routes6 = append(r.routes6, []string{
 					network6.String(),
 					"dev", input.Interface,
+					"mtu", mtuStr,
 				})
 			}
 		}
 	}
 
-	if !hasDefault {
-		r.routes = append(r.routes, []string{
-			"default", "via",
-			"0.0.0.0",
-		})
+	err = utils.SetInterfaceMtu6(r.Bridge, gatewayMtu)
+	if err != nil {
+		return
 	}
 
 	r.routes = append(r.routes, []string{

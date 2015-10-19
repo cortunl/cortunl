@@ -152,34 +152,36 @@ func GetGateways() (gateways map[string]net.IP, err error) {
 
 	for _, line := range strings.Split(output, "\n") {
 		fields := strings.Fields(line)
-		if len(fields) == 8 {
-			addr := net.ParseIP(fields[1])
-			if addr == nil || bytes.HasSuffix(addr, nilAddr) {
+		if len(fields) != 8 {
+			continue
+		}
+
+		addr := net.ParseIP(fields[1])
+		if addr == nil || IsNilAddr(addr) {
+			continue
+		}
+		iface := fields[7]
+
+		var gwList *list.List
+		gwSet, ok := gatewaySets[iface]
+		if !ok {
+			gwSet = set.NewSet()
+			gatewaySets[iface] = gwSet
+
+			gwList = list.New()
+			gatewaysList[iface] = gwList
+		} else {
+			if gwSet.Contains(addr) {
 				continue
 			}
-			iface := fields[7]
 
-			var gwList *list.List
-			gwSet, ok := gatewaySets[iface]
-			if !ok {
-				gwSet = set.NewSet()
-				gatewaySets[iface] = gwSet
+			gwList = gatewaysList[iface]
+		}
 
-				gwList = list.New()
-				gatewaysList[iface] = gwList
-			} else {
-				if gwSet.Contains(addr) {
-					continue
-				}
-
-				gwList = gatewaysList[iface]
-			}
-
-			if addr[len(addr)-1] == 1 {
-				gwList.PushFront(addr)
-			} else {
-				gwList.PushBack(addr)
-			}
+		if addr[len(addr)-1] == 1 {
+			gwList.PushFront(addr)
+		} else {
+			gwList.PushBack(addr)
 		}
 	}
 

@@ -19,12 +19,12 @@ func connectWired(netwk *network.WiredNetwork) (err error) {
 		netwk.Interface,
 	)
 
-	err = utils.Write(confPathPrefix + netwk.Interface, data)
+	err = utils.Write(confPathPrefix+netwk.Interface, data)
 	if err != nil {
 		return
 	}
 
-	err = utils.Exec("", "netctl", "start", confNamePrefix + netwk.Interface)
+	err = utils.Exec("", "netctl", "start", confNamePrefix+netwk.Interface)
 	if err != nil {
 		return
 	}
@@ -50,12 +50,12 @@ func connectWireless(netwk *network.WirelessNetwork) (err error) {
 		data += fmt.Sprintf("%s='%s'\n", key, val)
 	}
 
-	err = utils.Write(confPathPrefix + netwk.Interface, data)
+	err = utils.Write(confPathPrefix+netwk.Interface, data)
 	if err != nil {
 		return
 	}
 
-	err = utils.Exec("", "netctl", "start", confNamePrefix + netwk.Interface)
+	err = utils.Exec("", "netctl", "start", confNamePrefix+netwk.Interface)
 	if err != nil {
 		return
 	}

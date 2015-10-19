@@ -250,6 +250,11 @@ func GetInterfaceAddr(iface string) (ifaceAddr *InterfaceAddr, err error) {
 		return
 	}
 
+	gateways6, err := GetGateways6()
+	if err != nil {
+		return
+	}
+
 	ifaceAddr = &InterfaceAddr{}
 
 	ifaces, err := net.Interfaces()
@@ -284,10 +289,7 @@ func GetInterfaceAddr(iface string) (ifaceAddr *InterfaceAddr, err error) {
 
 			if strings.Contains(adr.String(), ":") {
 				if ifaceAddr.Network6 == nil {
-					gateway := CopyIp(network.IP)
-					IncIp(gateway)
-
-					ifaceAddr.Gateway6 = gateway
+					ifaceAddr.Gateway6 = gateways6[itf.Name]
 					ifaceAddr.Address6 = adr
 					ifaceAddr.Network6 = network
 				}

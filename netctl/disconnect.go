@@ -12,3 +12,12 @@ func Disconnect(iface string) (err error) {
 
 	return
 }
+
+func DisconnectAll() (err error) {
+	err = utils.Exec("", "netctl", "stop-all")
+	if err != nil {
+		return
+	}
+
+	return
+}

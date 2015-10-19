@@ -44,6 +44,11 @@ func (r *Routes) createTable() (err error) {
 		return
 	}
 
+	err = utils.Exec("", "ip", "-6", "route", "flush", "table", r.table.Name)
+	if err != nil {
+		return
+	}
+
 	return
 }
 

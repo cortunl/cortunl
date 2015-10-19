@@ -46,6 +46,7 @@ func (t *IpTables) Init() {
 				"-j", "MASQUERADE",
 				"-s", network.String(),
 			}, ipv6)
+
 			t.addRule([]string{
 				"FORWARD",
 				"-i", input.Interface,

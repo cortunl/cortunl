@@ -10,6 +10,8 @@ func Disconnect(iface string) (err error) {
 		return
 	}
 
+	_ = utils.Exec("", "ip", "link", "set", iface, "down")
+
 	return
 }
 

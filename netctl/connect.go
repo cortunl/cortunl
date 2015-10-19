@@ -12,8 +12,6 @@ func connectWired(netwk *network.WiredNetwork) (err error) {
 		return
 	}
 
-	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
-
 	data := fmt.Sprintf(conf,
 		"wired",
 		netwk.Interface,
@@ -37,8 +35,6 @@ func connectWireless(netwk *network.WirelessNetwork) (err error) {
 	if err != nil {
 		return
 	}
-
-	_ = utils.Exec("", "ip", "link", "set", netwk.Interface, "down")
 
 	data := fmt.Sprintf(conf,
 		"wireless",

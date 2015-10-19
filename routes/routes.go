@@ -5,6 +5,7 @@ import (
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -76,8 +77,16 @@ func (r *Routes) removeTable() (err error) {
 func (r *Routes) getRoutes() (err error) {
 	r.routes = [][]string{}
 	hasDefault := false
+	gatewayMtu := 0
 
 	for _, input := range r.Inputs {
+		mtu, e := utils.GetInterfaceMtu6(input.Interface)
+		if e != nil {
+			err = e
+			return
+		}
+		mtuStr := strconv.Itoa(mtu)
+
 		inputAddr, e := utils.GetInterfaceAddr(input.Interface)
 		if e != nil {
 			err = e
@@ -93,10 +102,13 @@ func (r *Routes) getRoutes() (err error) {
 			})
 
 			if inputAddr.Gateway6 != nil {
+				gatewayMtu = mtu
+
 				r.routes6 = append(r.routes6, []string{
 					"default", "via",
 					inputAddr.Gateway6.String(),
 					"dev", input.Interface,
+					"mtu", mtuStr,
 				})
 			}
 

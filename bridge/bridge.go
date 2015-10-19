@@ -8,17 +8,33 @@ import (
 )
 
 type Bridge struct {
+	running  bool
 	Bridge   string
 	Network  *net.IPNet
 	Network6 *net.IPNet
 	Outputs  []*settings.Output
 }
 
-func (b *Bridge) Start() (err error) {
+func (b *Bridge) Init() {
 	if b.Bridge != "" {
-		panic("bridge: Bridge already started")
+		panic("bridge: Bridge already init")
 	}
 	b.Bridge = reserveBridge()
+}
+
+func (b *Bridge) Deinit() {
+	if b.Bridge == "" {
+		return
+	}
+	releaseBridge(b.Bridge)
+	b.Bridge = ""
+}
+
+func (b *Bridge) Start() (err error) {
+	if b.running {
+		panic("bridge: Bridge already started")
+	}
+	b.running = true
 
 	err = utils.Exec("", "brctl", "addbr", b.Bridge)
 	if err != nil {
@@ -79,14 +95,13 @@ func (b *Bridge) Start() (err error) {
 }
 
 func (b *Bridge) Stop() (err error) {
-	if b.Bridge == "" {
+	if !b.running {
 		return
 	}
+	b.running = false
 
 	_ = utils.Exec("", "ip", "link", "set", "dev", b.Bridge, "down")
 	_ = utils.Exec("", "brctl", "delbr", b.Bridge)
-
-	releaseBridge(b.Bridge)
 
 	return
 }

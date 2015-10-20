@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Status() (status bool, err error) {
+func Status(iface string) (status bool, err error) {
 	conn, err := dbus.New()
 	if err != nil {
 		err = &constants.UnknownError{
@@ -19,7 +19,8 @@ func Status() (status bool, err error) {
 	defer conn.Close()
 
 	prop, err := conn.GetUnitProperty(
-		fmt.Sprintf("netctl@%s.service", confName), "ActiveState")
+		fmt.Sprintf("netctl@%s.service",
+			confNamePrefix+iface), "ActiveState")
 	if err != nil {
 		err = &constants.UnknownError{
 			errors.Wrap(err, "netctl: Failed to get systemd service status"),

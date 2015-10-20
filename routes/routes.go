@@ -134,9 +134,11 @@ func (r *Routes) getRoutes() (err error) {
 		}
 	}
 
-	err = utils.SetInterfaceMtu6(r.Bridge, gatewayMtu)
-	if err != nil {
-		return
+	if gatewayMtu != 0 {
+		err = utils.SetInterfaceMtu6(r.Bridge, gatewayMtu)
+		if err != nil {
+			return
+		}
 	}
 
 	r.routes = append(r.routes, []string{

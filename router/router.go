@@ -5,9 +5,12 @@ import (
 	"github.com/cortunl/cortunl/dhcp"
 	"github.com/cortunl/cortunl/hostapd"
 	"github.com/cortunl/cortunl/iptables"
+	"github.com/cortunl/cortunl/netctl"
+	"github.com/cortunl/cortunl/network"
 	"github.com/cortunl/cortunl/routes"
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
+	"github.com/dropbox/godropbox/errors"
 	"strings"
 	"time"
 )
@@ -73,6 +76,51 @@ func (r *Router) Init() {
 }
 
 func (r *Router) Start() (err error) {
+	for _, input := range r.Settings.Inputs {
+		if strings.HasPrefix(input.Interface, "w") {
+			netwks, e := netctl.GetNetworks(input.Interface)
+			if e != nil {
+				err = e
+				return
+			}
+
+			var netwk *network.WirelessNetwork
+
+			for _, n := range netwks {
+				if n.Ssid == input.WirelessSsid {
+					netwk = n
+					break
+				}
+			}
+
+			if netwk == nil {
+				err = &ConnectError{
+					errors.Newf("router: Failed to find wireless network "+
+						"'%s' on '%s'", input.Interface, input.WirelessSsid),
+				}
+				return
+			}
+
+			netwk.Security.Set("password", input.WirelessPassword)
+
+			err = netctl.Connect(netwk)
+			if err != nil {
+				return
+			}
+		} else {
+			netwk := &network.WiredNetwork{
+				Network: &network.Network{
+					Interface: input.Interface,
+				},
+			}
+
+			err = netctl.Connect(netwk)
+			if err != nil {
+				return
+			}
+		}
+	}
+
 	err = utils.EnableIpForwarding()
 	if err != nil {
 		return

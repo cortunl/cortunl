@@ -5,7 +5,7 @@ import (
 )
 
 func Disconnect(iface string) (err error) {
-	err = utils.Exec("", "netctl", confNamePrefix+iface)
+	err = utils.Exec("", "netctl", "stop", confNamePrefix+iface)
 	if err != nil {
 		return
 	}

@@ -13,7 +13,7 @@ func connectWired(netwk *network.WiredNetwork) (err error) {
 	}
 
 	data := fmt.Sprintf(conf,
-		"wired",
+		"ethernet",
 		netwk.Interface,
 	)
 

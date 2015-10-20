@@ -191,5 +191,9 @@ func (r *Router) Stop() (err error) {
 		return
 	}
 
+	for _, input := range r.Settings.Inputs {
+		netctl.Disconnect(input.Interface)
+	}
+
 	return
 }

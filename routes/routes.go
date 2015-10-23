@@ -1,12 +1,14 @@
 package routes
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Routes struct {
@@ -79,6 +81,16 @@ func (r *Routes) getRoutes() (err error) {
 	hasDefault := false
 	gatewayMtu := 0
 
+	mainRoutes, err := GetRoutes()
+	if err != nil {
+		return
+	}
+
+	mainRoutes6, err := GetRoutes6()
+	if err != nil {
+		return
+	}
+
 	for _, input := range r.Inputs {
 		mtu, e := utils.GetInterfaceMtu6(input.Interface)
 		if e != nil {
@@ -96,40 +108,81 @@ func (r *Routes) getRoutes() (err error) {
 		if input.AllTraffic && !hasDefault {
 			hasDefault = true
 
-			r.routes = append(r.routes, []string{
-				"default", "via",
-				inputAddr.Gateway.String(),
-			})
+			cmd := []string{}
+			for _, route := range mainRoutes {
+				if route.Default &&
+					route.Interface == input.Interface &&
+					bytes.Equal(route.Address, inputAddr.Gateway) {
+
+					cmd = route.Command
+					break
+				}
+			}
+			if len(cmd) == 0 {
+				cmd = []string{
+					"default", "via",
+					inputAddr.Gateway.String(),
+					"dev", input.Interface,
+				}
+			}
+			r.routes = append(r.routes, cmd)
 
 			if inputAddr.Gateway6 != nil {
 				gatewayMtu = mtu
 
-				r.routes6 = append(r.routes6, []string{
-					"default", "via",
-					inputAddr.Gateway6.String(),
-					"dev", input.Interface,
-					"mtu", mtuStr,
-				})
+				cmd := []string{}
+				for _, route := range mainRoutes6 {
+					if route.Default &&
+						route.Interface == input.Interface &&
+						bytes.Equal(route.Address, inputAddr.Gateway6) {
+
+						cmd = route.Command
+						break
+					}
+				}
+				if len(cmd) == 0 {
+					cmd = []string{
+						"default", "via",
+						inputAddr.Gateway6.String(),
+						"dev", input.Interface,
+						"mtu", mtuStr,
+					}
+				}
+				r.routes = append(r.routes, cmd)
 			}
 
-			r.routes = append(r.routes, []string{
-				inputAddr.Network.String(),
-				"dev", input.Interface,
-			})
+			cmd = []string{}
+			for _, route := range mainRoutes {
+				if route.Interface == input.Interface &&
+					route.Network != nil &&
+					bytes.Equal(route.Network.IP, inputAddr.Network.IP) &&
+					bytes.Equal(route.Network.Mask, inputAddr.Network.Mask) {
+
+					cmd = route.Command
+					break
+				}
+			}
+			if len(cmd) == 0 {
+				cmd = []string{
+					inputAddr.Network.String(),
+					"dev", input.Interface,
+				}
+			}
+			r.routes = append(r.routes, cmd)
 		} else {
 			for _, network := range input.Networks {
-				r.routes = append(r.routes, []string{
-					network.String(),
-					"dev", input.Interface,
-				})
-			}
-
-			for _, network6 := range input.Networks6 {
-				r.routes6 = append(r.routes6, []string{
-					network6.String(),
-					"dev", input.Interface,
-					"mtu", mtuStr,
-				})
+				if utils.IsIPNet6(network) {
+					r.routes6 = append(r.routes6, []string{
+						network.String(),
+						"dev", input.Interface,
+						"mtu", mtuStr,
+					})
+				} else {
+					r.routes = append(r.routes, []string{
+						network.String(),
+						"dev", input.Interface,
+					})
+				}
 			}
 		}
 	}

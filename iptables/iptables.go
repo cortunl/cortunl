@@ -64,15 +64,11 @@ func (t *IpTables) Init() {
 					"-j", "ACCEPT",
 				}, ipv6)
 			} else {
-				var networks []*net.IPNet
+				for _, network := range input.Networks {
+					if ipv6 != utils.IsIPNet6(network) {
+						continue
+					}
 
-				if ipv6 {
-					networks = input.Networks6
-				} else {
-					networks = input.Networks
-				}
-
-				for _, network := range networks {
 					t.addRule([]string{
 						"FORWARD",
 						"-i", t.Bridge,

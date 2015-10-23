@@ -142,6 +142,14 @@ func IsNilAddr6(addr net.IP) bool {
 	return bytes.Equal(addr, nilAddr6)
 }
 
+func IsIP6(addr net.IP) bool {
+	return strings.Contains(addr.String(), ":")
+}
+
+func IsIPNet6(network *net.IPNet) bool {
+	return strings.Contains(network.String(), ":")
+}
+
 func GetGateways() (gateways map[string]net.IP, err error) {
 	gateways = map[string]net.IP{}
 	gatewaysList := map[string]*list.List{}

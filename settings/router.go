@@ -10,6 +10,7 @@ type Input struct {
 	WirelessSsid     string
 	WirelessPassword string
 	AllTraffic       bool
+	NatInterface     bool
 	Networks         []*net.IPNet
 }
 

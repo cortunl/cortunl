@@ -11,7 +11,6 @@ type Input struct {
 	WirelessPassword string
 	AllTraffic       bool
 	Networks         []*net.IPNet
-	Networks6        []*net.IPNet
 }
 
 type Output struct {

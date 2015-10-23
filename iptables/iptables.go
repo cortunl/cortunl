@@ -39,13 +39,15 @@ func (t *IpTables) Init() {
 		for i, network := range []*net.IPNet{t.Network, t.Network6} {
 			ipv6 := i == 1
 
-			t.addRule([]string{
-				"POSTROUTING",
-				"-t", "nat",
-				"-o", input.Interface,
-				"-j", "MASQUERADE",
-				"-s", network.String(),
-			}, ipv6)
+			if input.NatInterface {
+				t.addRule([]string{
+					"POSTROUTING",
+					"-t", "nat",
+					"-o", input.Interface,
+					"-j", "MASQUERADE",
+					"-s", network.String(),
+				}, ipv6)
+			}
 
 			t.addRule([]string{
 				"FORWARD",

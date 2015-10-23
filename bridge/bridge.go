@@ -36,6 +36,8 @@ func (b *Bridge) Start() (err error) {
 	}
 	b.running = true
 
+	_ = utils.ExecSilent("", "brctl", "delbr", b.Bridge)
+
 	err = utils.Exec("", "brctl", "addbr", b.Bridge)
 	if err != nil {
 		return

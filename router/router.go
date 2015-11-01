@@ -96,7 +96,7 @@ func (r *Router) Start() (err error) {
 			if netwk == nil {
 				err = &ConnectError{
 					errors.Newf("router: Failed to find wireless network "+
-						"'%s' on '%s'", input.WirelessSsid,  input.Interface),
+						"'%s' on '%s'", input.WirelessSsid, input.Interface),
 				}
 				return
 			}

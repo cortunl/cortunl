@@ -278,9 +278,25 @@ func (r *Routes) AddRoutes() (err error) {
 		}
 	}
 
+	for _, args := range r.rules {
+		args = append([]string{"rule", "add"}, args...)
+		err = utils.Exec("", "ip", args...)
+		if err != nil {
+			return
+		}
+	}
+
+	for _, args := range r.rules6 {
+		args = append([]string{"-6", "rule", "add"}, args...)
+		err = utils.Exec("", "ip", args...)
+		if err != nil {
+			return
+		}
+	}
+
 	r.runner.Add(1)
 	go func() {
-	Runner:
+		Runner:
 		for r.stop != true {
 			for i := 0; i < 5; i++ {
 				time.Sleep(200 * time.Millisecond)
@@ -303,22 +319,6 @@ func (r *Routes) AddRoutes() (err error) {
 		}
 		r.runner.Done()
 	}()
-
-	for _, args := range r.rules {
-		args = append([]string{"rule", "add"}, args...)
-		err = utils.Exec("", "ip", args...)
-		if err != nil {
-			return
-		}
-	}
-
-	for _, args := range r.rules6 {
-		args = append([]string{"-6", "rule", "add"}, args...)
-		err = utils.Exec("", "ip", args...)
-		if err != nil {
-			return
-		}
-	}
 
 	return
 }

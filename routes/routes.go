@@ -296,7 +296,7 @@ func (r *Routes) AddRoutes() (err error) {
 
 	r.runner.Add(1)
 	go func() {
-		Runner:
+	Runner:
 		for r.stop != true {
 			for i := 0; i < 5; i++ {
 				time.Sleep(200 * time.Millisecond)

@@ -8,10 +8,13 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 type Routes struct {
+	runner   sync.WaitGroup
+	stop     bool
 	routes   [][]string
 	routes6  [][]string
 	rules    [][]string
@@ -240,6 +243,8 @@ func (r *Routes) AddRoutes() (err error) {
 		panic("routes: Routes already added")
 	}
 	r.table = reserveTable()
+	r.runner = sync.WaitGroup{}
+	r.stop = false
 
 	err = r.createTable()
 	if err != nil {
@@ -273,6 +278,32 @@ func (r *Routes) AddRoutes() (err error) {
 		}
 	}
 
+	r.runner.Add(1)
+	go func() {
+	Runner:
+		for r.stop != true {
+			for i := 0; i < 5; i++ {
+				time.Sleep(200 * time.Millisecond)
+				if r.stop {
+					break Runner
+				}
+			}
+
+			for _, args := range r.routes {
+				args = append([]string{"route", "add",
+					"table", r.table.Name}, args...)
+				_ = utils.ExecSilent("", "ip", args...)
+			}
+
+			for _, args := range r.routes6 {
+				args = append([]string{"-6", "route", "add",
+					"table", r.table.Name}, args...)
+				_ = utils.ExecSilent("", "ip", args...)
+			}
+		}
+		r.runner.Done()
+	}()
+
 	for _, args := range r.rules {
 		args = append([]string{"rule", "add"}, args...)
 		err = utils.Exec("", "ip", args...)
@@ -297,6 +328,9 @@ func (r *Routes) RemoveRoutes() (err error) {
 		return
 	}
 	defer r.removeTable()
+
+	r.stop = true
+	r.runner.Wait()
 
 	for _, args := range r.routes {
 		args = append([]string{"route", "del", "table", r.table.Name}, args...)

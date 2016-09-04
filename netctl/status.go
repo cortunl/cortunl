@@ -30,8 +30,8 @@ func Status(iface string) (status bool, err error) {
 
 	val := strings.Replace(prop.Value.String(), `"`, "", -1)
 
-	if val != "active" {
-		status = false
+	if val == "active" {
+		status = true
 	}
 
 	return

@@ -13,7 +13,7 @@ const (
 const conf = `driver=%s
 ssid=%s
 interface=%s
-#bridge=%s
+bridge=%s
 hw_mode=g
 country_code=US
 ieee80211d=1

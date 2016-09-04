@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 )
 
 type Hostapd struct {
@@ -27,11 +26,7 @@ func (h *Hostapd) getDriver() (drv Driver) {
 	case Realtek:
 		drv = Realtek
 	default:
-		if runtime.GOARCH == "arm" {
-			drv = Realtek
-		} else {
-			drv = NetLink
-		}
+		drv = NetLink
 	}
 
 	return

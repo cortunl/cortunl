@@ -85,15 +85,7 @@ func (h *Hostapd) Start() (err error) {
 		return
 	}
 
-	bin := ""
-	switch h.getDriver() {
-	case NetLink:
-		bin = "hostapd"
-	case Realtek:
-		bin = "hostapd_rtl"
-	}
-
-	cmd := exec.Command(bin, path)
+	cmd := exec.Command("hostapd", path)
 	err = h.Run(cmd, func() {
 		os.RemoveAll(filepath.Dir(path))
 	})

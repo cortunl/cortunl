@@ -5,6 +5,7 @@ import (
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
 	"net"
+	"strings"
 )
 
 type Bridge struct {
@@ -44,6 +45,10 @@ func (b *Bridge) Start() (err error) {
 	}
 
 	for _, iface := range b.Outputs {
+		if strings.HasPrefix(iface.Interface, "w") {
+			continue
+		}
+
 		_ = utils.Exec("", "ip", "link", "set", "dev", iface.Interface, "down")
 		_ = utils.Exec("", "ip", "addr", "flush", "dev", iface.Interface)
 

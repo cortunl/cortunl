@@ -19,3 +19,7 @@ type UnknownError struct {
 type ExecError struct {
 	errors.DropboxError
 }
+
+type ValueError struct {
+	errors.DropboxError
+}

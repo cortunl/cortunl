@@ -333,7 +333,8 @@ func (r *Routes) RemoveRoutes() (err error) {
 	r.runner.Wait()
 
 	for _, args := range r.routes {
-		args = append([]string{"route", "del", "table", r.table.Name}, args...)
+		args = append([]string{"route", "del",
+			"table", r.table.Name}, args...)
 		_ = utils.Exec("", "ip", args...)
 	}
 

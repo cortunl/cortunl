@@ -1,27 +1,34 @@
 package router
 
 import (
+	"fmt"
 	"github.com/cortunl/cortunl/bridge"
 	"github.com/cortunl/cortunl/dhcp"
 	"github.com/cortunl/cortunl/hostapd"
 	"github.com/cortunl/cortunl/iptables"
-	"github.com/cortunl/cortunl/netctl"
-	"github.com/cortunl/cortunl/network"
 	"github.com/cortunl/cortunl/routes"
+	"github.com/cortunl/cortunl/runner"
 	"github.com/cortunl/cortunl/settings"
 	"github.com/cortunl/cortunl/utils"
-	"github.com/dropbox/godropbox/errors"
 	"strings"
 	"time"
 )
 
 type Router struct {
 	Settings *settings.Router
+	stopped  bool
+	errors   chan error
 	brdg     *bridge.Bridge
 	routes   *routes.Routes
 	dcp      *dhcp.Dhcp
 	hstpd    []*hostapd.Hostapd
 	iptables *iptables.IpTables
+}
+
+func (r *Router) onError(err error) {
+	if !r.stopped {
+		r.errors <- err
+	}
 }
 
 func (r *Router) Init() {

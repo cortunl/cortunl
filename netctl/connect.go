@@ -66,7 +66,7 @@ func Connect(netIntf interface{}) (err error) {
 	case *network.WirelessNetwork:
 		err = connectWireless(netwk)
 	default:
-		panic("wicd: Unknown network type")
+		panic("netctl: Unknown network type")
 	}
 	if err != nil {
 		return

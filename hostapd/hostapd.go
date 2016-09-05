@@ -69,7 +69,7 @@ func (h *Hostapd) writeConf() (path string, err error) {
 
 		bestStrength := 0
 		bestChannel := 0
-		for channel := 1; channel < 14; channel++ {
+		for channel := 1; channel < 12; channel++ {
 			strength := 0
 
 			strength += channels[channel-2]

@@ -216,6 +216,10 @@ func (r *Router) Stop() (err error) {
 		netctl.Disconnect(input.Interface)
 	}
 
+	for _, output := range r.Settings.Outputs {
+		_ = utils.Exec("", "ip", "link", "set", output.Interface, "down")
+	}
+
 	r.errors <- nil
 
 	return

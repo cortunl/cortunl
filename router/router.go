@@ -95,6 +95,13 @@ func (r *Router) Start() (err error) {
 	r.Conf()
 	r.stopped = false
 
+	for _, output := range r.Settings.Outputs {
+		err = utils.Exec("", "ip", "link", "set", output.Interface, "up")
+		if err != nil {
+			return
+		}
+	}
+
 	for _, input := range r.Settings.Inputs {
 		if strings.HasPrefix(input.Interface, "w") {
 			netwks, e := netctl.GetNetworks(input.Interface)

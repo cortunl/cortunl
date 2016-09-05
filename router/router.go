@@ -12,6 +12,7 @@ import (
 	"github.com/cortunl/cortunl/utils"
 	"strings"
 	"time"
+	"github.com/cortunl/cortunl/netctl"
 )
 
 type Router struct {
@@ -176,16 +177,7 @@ func (r *Router) Start() (err error) {
 }
 
 func (r *Router) Stop() (err error) {
-	err = r.brdg.Stop()
-	if err != nil {
-		return
-	}
-	r.brdg.Deinit()
-
-	err = r.routes.RemoveRoutes()
-	if err != nil {
-		return
-	}
+	r.stopped = true
 
 	for _, hostapdServer := range r.hstpd {
 		err = hostapdServer.Stop()
@@ -196,20 +188,33 @@ func (r *Router) Stop() (err error) {
 		hostapdServer.Wait()
 	}
 
-	err = r.dcp.Stop()
+	err = r.routes.RemoveRoutes()
 	if err != nil {
 		return
 	}
-	r.dcp.Wait()
 
 	err = r.iptables.RemoveRules()
 	if err != nil {
 		return
 	}
 
+	err = r.dcp.Stop()
+	if err != nil {
+		return
+	}
+	r.dcp.Wait()
+
+	err = r.brdg.Stop()
+	if err != nil {
+		return
+	}
+	r.brdg.Deinit()
+
 	for _, input := range r.Settings.Inputs {
 		netctl.Disconnect(input.Interface)
 	}
+
+	r.errors <- nil
 
 	return
 }

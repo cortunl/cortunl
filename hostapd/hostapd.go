@@ -2,9 +2,11 @@ package hostapd
 
 import (
 	"fmt"
+	"github.com/cortunl/cortunl/constants"
 	"github.com/cortunl/cortunl/netctl"
 	"github.com/cortunl/cortunl/runner"
 	"github.com/cortunl/cortunl/utils"
+	"github.com/dropbox/godropbox/errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -89,6 +91,13 @@ func (h *Hostapd) writeConf() (path string, err error) {
 		}
 
 		channel = bestChannel
+	}
+
+	if channel < 1 || channel > 11 {
+		err = &constants.ValueError{
+			errors.New("hostapd: Wifi channel out of range"),
+		}
+		return
 	}
 
 	data := fmt.Sprintf(conf,

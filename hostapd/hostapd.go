@@ -57,7 +57,7 @@ func (h *Hostapd) writeConf() (path string, err error) {
 	if channel == AutoChan {
 		channels := map[int]int{}
 
-		networks, e := netctl.GetNetworks("wlan0")
+		networks, e := netctl.GetNetworks(h.Interface)
 		if e != nil {
 			err = e
 			return

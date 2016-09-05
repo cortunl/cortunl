@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"github.com/cortunl/cortunl/bridge"
 	"github.com/cortunl/cortunl/dhcp"
 	"github.com/cortunl/cortunl/hostapd"

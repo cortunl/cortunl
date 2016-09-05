@@ -89,6 +89,9 @@ func (r *Router) Conf() {
 }
 
 func (r *Router) Start() (err error) {
+	r.Conf()
+	r.stopped = false
+
 	for _, input := range r.Settings.Inputs {
 		if strings.HasPrefix(input.Interface, "w") {
 			netwks, e := netctl.GetNetworks(input.Interface)

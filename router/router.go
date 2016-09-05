@@ -34,7 +34,7 @@ func (r *Router) onError(err error) {
 	}
 }
 
-func (r *Router) Conf() {
+func (r *Router) init() {
 	r.hstpd = []*hostapd.Hostapd{}
 
 	r.brdg = &bridge.Bridge{
@@ -92,7 +92,7 @@ func (r *Router) Conf() {
 }
 
 func (r *Router) Start() (err error) {
-	r.Conf()
+	r.init()
 	r.stopped = false
 
 	for _, output := range r.Settings.Outputs {

@@ -31,7 +31,7 @@ func (r *Router) onError(err error) {
 	}
 }
 
-func (r *Router) Init() {
+func (r *Router) Conf() {
 	r.hstpd = []*hostapd.Hostapd{}
 
 	r.brdg = &bridge.Bridge{

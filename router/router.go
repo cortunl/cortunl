@@ -231,3 +231,32 @@ func (r *Router) Stop() (err error) {
 
 	return
 }
+
+func (r *Router) Run() (err error) {
+	for {
+		r.errors = make(chan error, 64)
+
+		err = r.Start()
+		if err != nil {
+			return
+		}
+
+		for {
+			e := <-r.errors
+			if e == nil {
+				return
+			}
+
+			break
+		}
+
+		err = r.Stop()
+		if err != nil {
+			return
+		}
+
+		time.Sleep(1 * time.Second)
+	}
+
+	return
+}

@@ -2,6 +2,7 @@ package hostapd
 
 import (
 	"fmt"
+	"github.com/cortunl/cortunl/netctl"
 	"github.com/cortunl/cortunl/runner"
 	"github.com/cortunl/cortunl/utils"
 	"os"
@@ -54,7 +55,40 @@ func (h *Hostapd) writeConf() (path string, err error) {
 
 	channel := h.Channel
 	if channel == AutoChan {
-		channel = 1 // TODO
+		channels := map[int]int{}
+
+		networks, e := netctl.GetNetworks("wlan0")
+		if e != nil {
+			err = e
+			return
+		}
+
+		for _, net := range networks {
+			channels[net.Channel] += net.Quality
+		}
+
+		bestStrength := 0
+		bestChannel := 0
+		for channel := 1; channel < 14; channel++ {
+			strength := 0
+
+			strength += channels[channel-2]
+			strength += channels[channel-1]
+			strength += channels[channel]
+			strength += channels[channel+1]
+			strength += channels[channel+2]
+
+			if channel != 1 && channel != 6 && channel != 11 {
+				strength += 10
+			}
+
+			if bestChannel == 0 || strength <= bestStrength {
+				bestStrength = strength
+				bestChannel = channel
+			}
+		}
+
+		channel = bestChannel
 	}
 
 	data := fmt.Sprintf(conf,

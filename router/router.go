@@ -54,6 +54,9 @@ func (r *Router) Conf() {
 		}
 
 		server := &hostapd.Hostapd{
+			Runner: runner.Runner{
+				OnError: r.onError,
+			},
 			Driver:    hostapd.AutoDrv,
 			Interface: output.Interface,
 			Bridge:    r.brdg.Bridge,
@@ -66,6 +69,9 @@ func (r *Router) Conf() {
 	}
 
 	r.dcp = &dhcp.Dhcp{
+		Runner: runner.Runner{
+			OnError: r.onError,
+		},
 		Bridge:      r.brdg.Bridge,
 		LocalDomain: r.Settings.LocalDomain,
 		DnsServers:  r.Settings.DnsServers,

@@ -7,7 +7,7 @@ import (
 type Input struct {
 	Interface        string
 	Address          string
-	Router           string
+	RouterAddress    string
 	WirelessSsid     string
 	WirelessPassword string
 	AllTraffic       bool

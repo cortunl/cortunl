@@ -8,6 +8,8 @@ type Input struct {
 	Interface        string
 	Address          string
 	RouterAddress    string
+	Address6         string
+	RouterAddress6   string
 	WirelessSsid     string
 	WirelessPassword string
 	AllTraffic       bool

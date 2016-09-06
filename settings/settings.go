@@ -28,6 +28,9 @@ func init() {
 			},
 			Outputs: []*Output{
 				&Output{
+					Interface: "eth1",
+				},
+				&Output{
 					Interface: "wlan0",
 				},
 			},

@@ -6,7 +6,7 @@ import (
 
 type Input struct {
 	Interface        string
-	Address          string // TODO Add AddressDhcp and AddressStatic
+	Address          string
 	WirelessSsid     string
 	WirelessPassword string
 	AllTraffic       bool

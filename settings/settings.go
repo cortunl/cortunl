@@ -16,10 +16,10 @@ func init() {
 	_, network6, _ := net.ParseCIDR("fd32:3032::/64")
 
 	Settings.Routers = []*Router{
-		{
+		&Router{
 			LocalDomain: "network",
 			Inputs: []*Input{
-				{
+				&Input{
 					Interface:    "eth0",
 					AllTraffic:   true,
 					NatInterface: true,
@@ -27,10 +27,10 @@ func init() {
 				},
 			},
 			Outputs: []*Output{
-				{
+				&Output{
 					Interface: "eth1",
 				},
-				{
+				&Output{
 					Interface: "wlan0",
 				},
 			},

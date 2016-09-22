@@ -1,10 +1,17 @@
 package settings
 
 import (
+	"encoding/json"
+	"github.com/cortunl/cortunl/errortypes"
 	"github.com/cortunl/cortunl/hostapd"
+	"github.com/dropbox/godropbox/errors"
+	"io/ioutil"
 	"net"
+	"os"
 	"time"
 )
+
+var Path = "/etc/cortunl.json"
 
 var Settings = &SettingsData{
 	WirelessDriver: "auto",
@@ -49,9 +56,46 @@ func init() {
 			},
 		},
 	}
+
+	Settings.loaded = true
+}
+
+func Load() (err error) {
+	_, err = os.Stat(Path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = nil
+		} else {
+			err = &errortypes.ReadError{
+				errors.Wrap(err, "config: File stat error"),
+			}
+		}
+		return
+	}
+
+	file, err := ioutil.ReadFile(Path)
+	if err != nil {
+		err = &errortypes.ReadError{
+			errors.Wrap(err, "config: File read error"),
+		}
+		return
+	}
+
+	err = json.Unmarshal(file, Settings)
+	if err != nil {
+		err = &errortypes.ReadError{
+			errors.Wrap(err, "config: File unmarshal error"),
+		}
+		return
+	}
+
+	Settings.loaded = true
+
+	return
 }
 
 type SettingsData struct {
+	loaded         bool
 	Routers        []*Router
 	WirelessDriver string
 	BlinkDuration  time.Duration

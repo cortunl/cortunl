@@ -43,8 +43,8 @@ func init() {
 			},
 			Network:          network,
 			Network6:         network6,
-			WirelessSsid:     "archtest",
-			WirelessPassword: "archtest1234",
+			WirelessSsid:     "cortunl",
+			WirelessPassword: "cortunl",
 			WirelessChannel:  hostapd.AutoChan,
 			DnsServers: []string{
 				"8.8.8.8",

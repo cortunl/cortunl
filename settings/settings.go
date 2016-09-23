@@ -94,6 +94,33 @@ func Load() (err error) {
 	return
 }
 
+func Save() (err error) {
+	if !Settings.loaded {
+		err = &errortypes.WriteError{
+			errors.New("config: Config file has not been loaded"),
+		}
+		return
+	}
+
+	data, err := json.Marshal(Settings)
+	if err != nil {
+		err = &errortypes.WriteError{
+			errors.Wrap(err, "config: File marshal error"),
+		}
+		return
+	}
+
+	err = ioutil.WriteFile(Path, data, 0600)
+	if err != nil {
+		err = &errortypes.WriteError{
+			errors.Wrap(err, "config: File write error"),
+		}
+		return
+	}
+
+	return
+}
+
 type SettingsData struct {
 	loaded         bool
 	Routers        []*Router
